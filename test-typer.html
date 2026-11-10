@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>PTA 逐字输入 · 离线夹具测试</title>
+<style>
+  body{font:14px/1.6 -apple-system,"Microsoft YaHei",sans-serif;margin:0;padding:20px;background:#f6f7f9;color:#111827}
+  h1{font-size:18px;margin:0 0 12px}
+  #sum{padding:10px 14px;border-radius:8px;background:#fff;border:1px solid #e5e7eb;margin-bottom:14px;font-weight:600}
+  #sum.ok{color:#059669;border-color:#a7f3d0;background:#ecfdf5}
+  #sum.bad{color:#dc2626;border-color:#fecaca;background:#fef2f2}
+  ul{list-style:none;padding:0;margin:0;font:12px/1.7 Consolas,monospace}
+  li{padding:2px 0;border-bottom:1px dashed #eee}
+  .y{color:#059669}.n{color:#dc2626}
+  .e{color:#b45309}
+  #exam-app{border:1px solid #d1d5db;border-radius:8px;background:#fff;padding:12px;margin-bottom:14px}
+  #exam-app .stem{color:#374151;margin-bottom:8px}
+  #exam-app .cm-content{min-height:90px;border:1px solid #d1d5db;border-radius:6px;padding:8px;
+    font:12px/1.5 Consolas,monospace;white-space:pre-wrap;background:#fafafa;outline:none}
+  #exam-app .decoy{border-top:1px solid #eee;margin-top:10px;padding-top:8px;color:#9ca3af}
+</style>
+</head>
+<body>
+<h1>PTA 逐字输入 · 离线夹具测试</h1>
+<div id="sum">运行中…</div>
+<ul id="out"></ul>
+
+<div id="exam-app"></div>
+
+<script>
+// 收集未捕获错误
+window.__ERRS__ = [];
+window.addEventListener('error', function (e) {
+  window.__ERRS__.push((e.message || '?') + ' @' + (e.filename || '?') + ':' + (e.lineno || 0));
+});
+</script>
+
+<!-- 带 cache buster，避免改了脚本刷新还是旧版 -->
+<script>
+  document.write('<script src="pta-typer.user.js?t=' + Date.now() + '"><\/script>');
+</script>
+
+<script>
+(async function () {
+  var R = { pass: 0, fail: 0, errs: [], lines: [] };
+  var out = document.getElementById('out');
+
+  function ck(name, cond, extra) {
+    var ok = !!cond;
+    if (ok) R.pass++; else R.fail++;
+    var li = document.createElement('li');
+    li.className = ok ? 'y' : 'n';
+    li.textContent = (ok ? '✓ ' : '✗ ') + name +
+      (!ok && extra !== undefined ? '   [' + JSON.stringify(extra) + ']' : '');
+    out.appendChild(li);
+    R.lines.push({ name: name, ok: ok, extra: extra });
+  }
+
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  // ---------- 假 CodeMirror 6 view ----------
+  function fakeCM(el, init) {
+    var doc = init || '';
+    var view = {
+      __n: 0,
+      state: {
+        doc: {
+          get length() { return doc.length; },
+          toString: function () { return doc; }
+        }
+      },
+      dispatch: function (tr) {
+        var ch = tr && tr.changes;
+        if (ch) {
+          doc = doc.slice(0, ch.from) + (ch.insert || '') + doc.slice(ch.to);
+          view.__n++;
+        }
+      }
+    };
+    el.cmTile = { view: view };
+    return view;
+  }
+
+  function setScene(html, initMap) {
+    var root = document.getElementById('exam-app');
+    root.innerHTML = html;
+    var els = root.querySelectorAll('.cm-content[data-cm="1"]');
+    Array.prototype.forEach.call(els, function (e) {
+      var k = e.getAttribute('data-key');
+      fakeCM(e, (initMap && initMap[k]) || '');
+    });
+  }
+
+  var A = window.__PTA_TYPER__;
+
+  // ================= 0. 环境 =================
+  ck('脚本已加载（__PTA_TYPER__ 存在）', !!A);
+  ck('面板已创建（#pta-typer）', !!document.getElementById('pta-typer'));
+  ck('入口按钮已创建（#pta-typer-fab）', !!document.getElementById('pta-typer-fab'));
+  if (!A) return finish();
+
+  // ================= 1. 面板里自己的粘贴要能用 =================
+  // PTA 的禁粘贴可能挂在 document 捕获阶段，连我们的框也会被拦。
+  // 所以面板自己接管 paste：读到文本、自己插进光标处。
+  var pasteHits = 0;
+  document.addEventListener('paste', function () { pasteHits++; }, true);
+
+  var ta = document.querySelector('#pta-typer textarea');
+  ta.value = '';
+  ta.focus();
+  var dt = new DataTransfer();
+  dt.setData('text', 'ABC');
+  ta.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+  await sleep(20);
+  ck('面板里粘贴能落进自己的框', ta.value === 'ABC', ta.value);
+
+  // 从这里开始不再有粘贴动作
+  pasteHits = 0;
+
+  // ================= 2. 找编辑器 =================
+  setScene(
+    '<div class="pc-x" id="q9">' +
+      '<div class="stem">给定代码，补全函数。</div>' +
+      '<div class="CodingProblemAnswerForm_JoDvx">' +
+        '<div class="cm-editor"><div class="cm-content" contenteditable="true" data-cm="1" data-key="ans"></div></div>' +
+      '</div>' +
+      '<div class="decoy">测试用例面板' +
+        '<div class="cm-editor"><div class="cm-content" contenteditable="true" data-cm="1" data-key="decoy">DOM-文本-不该被读到</div></div>' +
+      '</div>' +
+    '</div>',
+    { decoy: '1,2,3,4,4,5' }
+  );
+
+  var ansEl = document.querySelector('[data-key="ans"]');
+  var decoyEl = document.querySelector('[data-key="decoy"]');
+
+  ck('findEditor 找的是答题区，不是测试用例面板',
+    A.findEditor() === ansEl, A.findEditor() === decoyEl ? 'picked decoy' : 'other');
+  ck('viewOf 认 cmTile.view', A.viewOf(ansEl) === ansEl.cmTile.view);
+  ck('readEditor 读的是文档模型，不是 DOM 文本',
+    A.readEditor(decoyEl) === '1,2,3,4,4,5' && A.domText(decoyEl).indexOf('DOM-文本') >= 0,
+    { model: A.readEditor(decoyEl), dom: A.domText(decoyEl) });
+
+  // ================= 3. cm 路线（真 PTA 的主路） =================
+  var view = ansEl.cmTile.view;
+  var CODE = 'def remove_duplicate(L):\n    return len(set(L))\n';
+  var r1 = await A.typeCode(CODE, { delayMs: 0 });
+  ck('cm 路线：返回 ok', r1.ok, r1);
+  ck('cm 路线：回读一字不差', A.normCode(r1.got) === A.normCode(CODE), r1.got);
+  ck('cm 路线：是一个字符一个字符写的（dispatch 次数 = 字数 + 1 次清空）',
+    view.__n === CODE.length + 1, { n: view.__n, len: CODE.length });
+  ck('cm 路线：写之前把旧内容清干净了',
+    view.state.doc.toString() === CODE, view.state.doc.toString());
+
+  // 再写一次，验证会重置而不是追加
+  var r1b = await A.typeCode('x=1', { delayMs: 0 });
+  ck('cm 路线：重复写会重置而不是追加', r1b.ok && view.state.doc.toString() === 'x=1',
+    view.state.doc.toString());
+
+  // ================= 4. exec 路线（纯 contenteditable，没有 cmView） =================
+  setScene(
+    '<div class="pc-x" id="q8">' +
+      '<div class="stem">没有 CodeMirror 的编辑器</div>' +
+      '<div class="AnswerFormX"><div class="plain" contenteditable="true" data-key="plain"></div></div>' +
+    '</div>'
+  );
+  var plainEl = document.querySelector('[data-key="plain"]');
+  var CODE2 = 'int main() {\n  return 0;\n}';
+  var r2 = await A.typeCode(CODE2, { delayMs: 0, el: plainEl });
+  ck('exec 路线：返回 ok', r2.ok, r2);
+  ck('exec 路线：回读一字不差（换行靠 insertLineBreak）',
+    A.normCode(r2.got) === A.normCode(CODE2), r2.got);
+  ck('exec 路线：走的是 exec 不是 cm', r2.how === 'exec', r2.how);
+
+  // ================= 5. set 路线（textarea） =================
+  setScene(
+    '<div class="pc-x" id="q7">' +
+      '<div class="stem">纯文本框</div>' +
+      '<div class="AnswerFormX"><textarea data-key="ta"></textarea></div>' +
+    '</div>'
+  );
+  var taEl = document.querySelector('[data-key="ta"]');
+  var r3 = await A.typeCode('print(1)', { delayMs: 0, el: taEl });
+  ck('set 路线：textarea 能整体写入', r3.ok && taEl.value === 'print(1)', { r: r3, v: taEl.value });
+
+  // ================= 6. 归一化 =================
+  ck('normCode 抹平 \\r\\n', A.normCode('a\r\nb') === A.normCode('a\nb'));
+  ck('normCode 抹平不间断空格', A.normCode('a\u00a0b') === 'a b', A.normCode('a\u00a0b'));
+  ck('normCode 抹平行尾空白', A.normCode('a   \nb') === 'a\nb', JSON.stringify(A.normCode('a   \nb')));
+  ck('normCode 抹平末尾多余空行', A.normCode('a\n\n\n') === 'a', JSON.stringify(A.normCode('a\n\n\n')));
+
+  // domText：<br> 当换行，不用 innerText（innerText 会折叠行首空格）
+  var probe = document.createElement('div');
+  probe.innerHTML = 'int main() {<br>&nbsp; return 0;<br>}';
+  ck('domText 把 <br> 当换行', A.domText(probe) === 'int main() {\n\u00a0 return 0;\n}',
+    JSON.stringify(A.domText(probe)));
+  ck('domText 不用 innerText（行首空格没被折叠）',
+    A.normCode(A.domText(probe)) === 'int main() {\n  return 0;\n}',
+    JSON.stringify(A.normCode(A.domText(probe))));
+
+  // ================= 7. 边界 =================
+  var r4 = await A.typeCode('', { delayMs: 0 });
+  ck('空内容拒绝：how === empty', r4.how === 'empty' && r4.ok === false, r4);
+
+  setScene('<div class="pc-x" id="q6"><div class="stem">这题没有编辑器</div></div>');
+  var r5 = await A.typeCode('print(1)', { delayMs: 0 });
+  ck('没编辑器时：how === no-editor 且不抛', r5.how === 'no-editor' && r5.ok === false, r5);
+
+  // 上面两个"失败"路径也不许偷偷用粘贴
+  ck('全程没有触发任何 paste 事件', pasteHits === 0, pasteHits);
+
+  // ================= 8. 真写一份长代码 =================
+  setScene(
+    '<div class="pc-x" id="q5"><div class="stem">长代码</div>' +
+    '<div class="CodingProblemAnswerForm_JoDvx">' +
+      '<div class="cm-editor"><div class="cm-content" contenteditable="true" data-cm="1" data-key="long"></div></div>' +
+    '</div></div>'
+  );
+  var longEl = document.querySelector('[data-key="long"]');
+  var LONG = '';
+  for (var i = 0; i < 40; i++) {
+    LONG += 'line ' + i + ': value = ' + (i * 7) + '  # 注释\n';
+  }
+  var r6 = await A.typeCode(LONG, { delayMs: 0, el: longEl });
+  ck('长代码（' + LONG.length + ' 字）也能一字不差', r6.ok && A.normCode(r6.got) === A.normCode(LONG),
+    r6.ok ? A.normCode(r6.got).length : r6);
+
+  finish();
+
+  function finish() {
+    R.errs = window.__ERRS__ || [];
+    var sum = document.getElementById('sum');
+    var txt = R.pass + ' ✓ / ' + R.fail + ' ✗';
+    if (R.errs.length) txt += ' · 页面未捕获错误 ' + R.errs.length + ' 条';
+    sum.textContent = '结果：' + txt;
+    sum.className = (R.fail === 0 && R.errs.length === 0) ? 'ok' : 'bad';
+    if (R.errs.length) {
+      R.errs.forEach(function (e) {
+        var li = document.createElement('li');
+        li.className = 'e';
+        li.textContent = '⚠ ' + e;
+        document.getElementById('out').appendChild(li);
+      });
+    }
+    window.__TYPER_TEST__ = {
+      pass: R.pass, fail: R.fail, errs: R.errs,
+      text: txt, lines: R.lines
+    };
+    console.log('[test-typer] ' + txt);
+  }
+})();
+</script>
+</body>
+</html>

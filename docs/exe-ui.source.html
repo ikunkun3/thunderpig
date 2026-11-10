@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>exe 界面</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #2b2b2b; }
+  body { display: flex; align-items: flex-start; justify-content: center; padding: 24px; }
+
+  /* ---------- 窗口外壳（模拟 Windows 11 标题栏） ---------- */
+  .win {
+    width: 900px;
+    background: #f7f7fb;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 18px 48px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.08);
+    font-family: "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+  }
+  .bar {
+    height: 32px; background: #f3f3f3;
+    display: flex; align-items: center; padding: 0 0 0 12px;
+    font-size: 12px; color: #1f1f1f; user-select: none;
+  }
+  .bar .t { flex: 1; }
+  .bar .btns { display: flex; }
+  .bar .btns div {
+    width: 46px; height: 32px; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #444;
+  }
+  .bar .btns .close:hover { background: #c42b1c; color: #fff; }
+
+  /* ---------- 紫色标题条 ---------- */
+  .head {
+    background: #4c1d95; height: 42px; display: flex; align-items: center;
+    padding: 0 14px;
+  }
+  .head .name { color: #fff; font-size: 17px; font-weight: 700; letter-spacing: .5px; }
+  .head .q {
+    margin-left: auto; background: #7c3aed; color: #fff;
+    font-size: 15px; font-weight: 700; width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center; border-radius: 3px;
+  }
+
+  /* ---------- 说明文字 ---------- */
+  .tip0 { padding: 8px 14px 2px; font-size: 13px; color: #6b7280; }
+  .tip1 { padding: 0 14px; font-size: 13px; color: #9ca3af; }
+
+  /* ---------- 代码框 ---------- */
+  .body { padding: 8px 14px 0; }
+  .editor {
+    background: #0b0d12; border-radius: 2px; height: 390px;
+    display: flex; position: relative;
+  }
+  .editor pre {
+    margin: 0; padding: 8px 10px; flex: 1;
+    font-family: Consolas, "Cascadia Mono", monospace; font-size: 15px;
+    line-height: 1.42; color: #c4b5fd; white-space: pre; overflow: hidden;
+  }
+  .editor .vs { width: 14px; background: #e9e9ef; }
+  .editor .vh { position: absolute; left: 0; right: 14px; bottom: 0; height: 14px; background: #e9e9ef; }
+
+  /* ---------- 控制条 ---------- */
+  .ctrl { display: flex; align-items: center; padding: 10px 14px 0; gap: 0; }
+  .lbl { font-size: 13px; color: #4b5563; }
+  .combo {
+    margin: 0 12px 0 6px; font-size: 13px; color: #111;
+    border: 1px solid #b9b9c3; background: #fff; border-radius: 3px;
+    padding: 3px 8px; min-width: 118px; display: flex; align-items: center;
+  }
+  .combo span { flex: 1; }
+  .combo i { font-style: normal; color: #666; font-size: 9px; }
+  .spin {
+    margin: 0 2px 0 6px; width: 44px; border: 1px solid #b9b9c3; background: #fff;
+    border-radius: 3px; display: flex; align-items: stretch; height: 24px;
+  }
+  .spin span { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .spin em { font-style: normal; width: 13px; border-left: 1px solid #d5d5dd; font-size: 8px;
+             display: flex; flex-direction: column; align-items: center; justify-content: center;
+             line-height: 1.0; color: #555; }
+  .unit { font-size: 13px; color: #4b5563; margin: 0 12px 0 2px; }
+
+  .chk { display: flex; align-items: center; font-size: 13px; color: #374151; margin-right: 10px; }
+  .chk .box {
+    width: 13px; height: 13px; border: 1px solid #8a8a99; background: #fff; margin-right: 5px;
+    display: flex; align-items: center; justify-content: center; border-radius: 2px;
+  }
+  .chk .box.on { background: #fff; }
+  .chk .box.on::after { content: ""; width: 7px; height: 4px; border-left: 2px solid #222;
+                        border-bottom: 2px solid #222; transform: rotate(-45deg) translate(1px,-2px); }
+
+  .spacer { flex: 1; }
+  .btn { font-size: 13px; padding: 5px 13px; border-radius: 3px; margin-left: 8px; }
+  .btn.gray { background: #e5e7eb; color: #374151; }
+  .btn.gray.off { color: #a7abb3; }
+  .btn.go { background: #6d28d9; color: #fff; font-weight: 700; padding: 5px 18px; font-size: 14px; }
+
+  /* ---------- 状态行 ---------- */
+  .status { padding: 8px 14px 0; font-size: 14px; color: #059669; }
+  .foot { padding: 8px 14px 12px; font-size: 13px; color: #9ca3af; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="bar">
+    <div class="t">哇嘞哇嘞大雷猪</div>
+    <div class="btns"><div>—</div><div>□</div><div class="close">✕</div></div>
+  </div>
+
+  <div class="head">
+    <div class="name">哇嘞哇嘞大雷猪</div>
+    <div class="q">?</div>
+  </div>
+
+  <div class="tip0">把代码粘到下面 → 点「开始敲」→ 3 秒内切回浏览器、光标点进代码框</div>
+  <div class="tip1">把代码一个字一个字敲进 PTA 的代码框。敲的是真实按键，不是粘贴，所以 PTA 的「禁止粘贴」拦不到。</div>
+  <div class="tip1">不联网 · 不替你点任何按钮 —— 题目还是你自己提交。</div>
+
+  <div class="body">
+    <div class="editor">
+      <pre>def mergeTwoLists(l1, l2):
+    dummy = ListNode(0)
+    cur = dummy
+
+    while l1 is not None and l2 is not None:
+        if l1.val &lt;= l2.val:
+            cur.next, l1 = l1, l1.next
+        else:
+            cur.next, l2 = l2, l2.next
+        cur = cur.next
+
+    cur.next = l1 if l1 is not None else l2
+    return dummy.next
+
+
+merge2list = mergeTwoLists</pre>
+      <div class="vs"></div>
+      <div class="vh"></div>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <div class="lbl">速度</div>
+    <div class="combo"><span>快 (8 毫秒)</span><i>▾</i></div>
+    <div class="lbl">等待</div>
+    <div class="spin"><span>3</span><em><b>▲</b><b>▼</b></em></div>
+    <div class="unit">秒</div>
+    <div class="chk"><span class="box on"></span>先全选清空代码框</div>
+    <div class="chk"><span class="box on"></span>PTA 模式</div>
+    <div class="chk"><span class="box on"></span>置顶</div>
+    <div class="spacer"></div>
+    <div class="btn gray">清空</div>
+    <div class="btn gray off">停止</div>
+    <div class="btn go">开始敲</div>
+  </div>
+
+  <div class="status">就绪 · 粘代码，或直接点「开始敲」（空着会自动读剪贴板）</div>
+  <div class="foot">只往浏览器里敲（会先检查最前面的窗口是不是浏览器，不是就取消）。敲的时候别碰键盘鼠标，会串字。</div>
+</div>
+</body>
+</html>

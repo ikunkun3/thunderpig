@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>6-1 示例：把列表去重 - 示例课程 · 编程练习（演示页）</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font: 14px/1.6 "Microsoft YaHei", system-ui, sans-serif;
+    color: #1f2328; background: #f5f6f8;
+    display: flex; flex-direction: column;
+  }
+
+  /* ---------- 浏览器外框（示意图：真截图拍不到浏览器自己的界面） ---------- */
+  #chrome { display: none; flex: 0 0 auto; background: #dfe3e8; border-bottom: 1px solid #c6ccd4; }
+  #chrome.on { display: block; }
+  #chrome .tabsrow { display: flex; align-items: flex-end; gap: 2px; padding: 6px 8px 0; }
+  #chrome .tab {
+    display: flex; align-items: center; gap: 8px; max-width: 260px;
+    background: #fff; border-radius: 8px 8px 0 0; padding: 7px 12px;
+    font-size: 12px; color: #3c4043; white-space: nowrap; overflow: hidden;
+  }
+  #chrome .tab i { font-style: normal; width: 14px; height: 14px; border-radius: 3px;
+                   background: #2f6fed; flex: 0 0 14px; }
+  #chrome .tab span { overflow: hidden; text-overflow: ellipsis; }
+  #chrome .newtab { color: #5f6368; font-size: 16px; padding: 0 8px 4px; }
+  #chrome .addrrow { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #fff; }
+  #chrome .nav { color: #5f6368; font-size: 15px; letter-spacing: 2px; }
+  #chrome .addr {
+    flex: 1; display: flex; align-items: center; gap: 8px; height: 30px;
+    background: #f1f3f4; border-radius: 15px; padding: 0 12px;
+    font-size: 12.5px; color: #3c4043;
+  }
+  #chrome .lock { color: #5f6368; font-size: 11px; }
+  #chrome .bookmarks {
+    display: flex; align-items: center; gap: 4px; padding: 4px 10px 6px; background: #fff;
+    border-top: 1px solid #eceff1;
+  }
+  #chrome .bm {
+    display: flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 5px;
+    font-size: 12px; color: #3c4043; white-space: nowrap;
+  }
+  #chrome .bm i { font-style: normal; font-size: 12px; }
+  #chrome .bm.hot { background: #e8f0fe; outline: 2px solid #2f6fed; outline-offset: -2px; }
+  #chrome .bm .tag { font-size: 10px; color: #2f6fed; font-weight: 700; }
+  /* 演示用鼠标指针 */
+  #cursor { position: fixed; width: 22px; height: 30px; pointer-events: none; z-index: 2147483600;
+            display: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+  #cursor.on { display: block; }
+
+  /* 示意外框打开时，书签工具的浮层只盖网页区，别盖住「浏览器界面」 */
+  body.hasChrome #pta-bm { top: var(--chrome-h, 0px) !important; }
+  /* ---------- 顶栏 ---------- */
+  .top {
+    height: 52px; flex: 0 0 52px; background: #1f2d3d; color: #dfe6ef;
+    display: flex; align-items: center; padding: 0 18px; gap: 12px; overflow: hidden;
+  }
+  .logo { flex: 0 0 auto; font-weight: 700; letter-spacing: .5px; font-size: 16px; color: #fff; }
+  .logo span { color: #7cc4ff; }
+  .top .name { flex: 1 1 auto; min-width: 0; font-size: 13px; color: #a9b6c6;
+               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .top .userbox { flex: 0 0 auto; margin-left: auto; display: flex; flex-direction: row;
+                  align-items: center; gap: 8px;
+                  font-size: 12px; color: #a9b6c6; white-space: nowrap; }
+  .top .userbox .clock { font-variant-numeric: tabular-nums; }
+  .avatar { width: 26px; height: 26px; flex: 0 0 26px; border-radius: 50%; background: #4a5a70;
+            display: flex; align-items: center; justify-content: center; color: #cfd9e5; font-size: 12px; }
+
+  /* ---------- 主体 ---------- */
+  .main { flex: 1; display: flex; min-height: 0; }
+  .side {
+    width: 210px; flex: 0 0 210px; background: #fff; border-right: 1px solid #e3e6ea;
+    padding: 12px 0; overflow: auto;
+  }
+  .side h4 { margin: 0 0 8px 16px; font-size: 12px; color: #6b7785; font-weight: 600; }
+  .side a {
+    display: flex; gap: 8px; padding: 7px 16px; color: #384250; text-decoration: none;
+    font-size: 13px; border-left: 3px solid transparent;
+  }
+  .side a i { font-style: normal; color: #8a94a1; width: 30px; flex: 0 0 30px; }
+  .side a.on { background: #eef4ff; border-left-color: #2f6fed; color: #1b4fd8; font-weight: 600; }
+
+  .content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .tabs { height: 44px; flex: 0 0 44px; background: #fff; border-bottom: 1px solid #e3e6ea;
+          display: flex; align-items: flex-end; padding: 0 16px; gap: 6px; }
+  .tabs a { padding: 8px 14px; font-size: 13px; color: #4b5563; text-decoration: none;
+            border-bottom: 2px solid transparent; }
+  .tabs a.on { color: #1b4fd8; border-bottom-color: #2f6fed; font-weight: 600; }
+  .tabs a em { font-style: normal; color: #9aa4b1; font-size: 12px; margin-left: 2px; }
+
+  .split { flex: 1; display: flex; min-height: 0; }
+  .left { flex: 1 1 50%; min-width: 0; overflow: auto; padding: 16px 20px; background: #fff; border-right: 1px solid #e3e6ea; }
+  .right { flex: 1 1 50%; min-width: 0; display: flex; flex-direction: column; background: #1e1e1e; }
+
+  h2.title { font-size: 17px; margin: 0 0 8px; color: #14181d; }
+  .meta { font-size: 12px; color: #7c8794; margin-bottom: 14px; }
+  .meta b { color: #d9480f; font-weight: 600; }
+  .stem p { margin: 0 0 10px; }
+  .stem h3 { font-size: 14px; margin: 16px 0 6px; color: #14181d; }
+  pre.sample {
+    background: #f6f8fa; border: 1px solid #e3e6ea; border-radius: 6px;
+    padding: 9px 11px; margin: 6px 0 12px; font: 13px/1.5 Consolas, monospace;
+    color: #24292f; overflow: auto;
+  }
+  .limit { font-size: 12px; color: #7c8794; margin-top: 14px; }
+
+  /* ---------- 代码区 ---------- */
+  .bar {
+    height: 38px; flex: 0 0 38px; background: #252526; border-bottom: 1px solid #333;
+    display: flex; align-items: center; padding: 0 10px; gap: 8px; color: #b9c0ca; font-size: 12px;
+  }
+  .bar .lang { color: #7cc4ff; }
+  .bar .sp { margin-left: auto; }
+  .bar button {
+    cursor: pointer; border: 1px solid #3c3c3c; background: #333; color: #d7dde5;
+    border-radius: 5px; padding: 5px 12px; font: 12px/1 "Microsoft YaHei", sans-serif;
+  }
+  .bar button.primary { background: #2f6fed; border-color: #2f6fed; color: #fff; font-weight: 600; }
+
+  .editorWrap { flex: 1; min-height: 0; overflow: auto; }
+  .AnswerFormDemo { height: 100%; }
+  .cm-content {
+    min-height: 100%; padding: 12px 14px; outline: none;
+    font: 13.5px/1.65 Consolas, "Courier New", monospace;
+    color: #d4d4d4; background: #1e1e1e; white-space: pre-wrap;
+    counter-reset: none;
+  }
+  .cm-content:focus { background: #202020; }
+
+  .result {
+    display: none; flex: 0 0 auto; max-height: 34%; overflow: auto;
+    background: #252526; border-top: 1px solid #333; padding: 10px 14px;
+    font: 12.5px/1.7 Consolas, monospace; color: #cfd6de;
+  }
+  .result.show { display: block; }
+  .result .ok { color: #4ec9a5; }
+  .result .head { color: #9aa4b1; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<!-- 浏览器外框：仅 ?chrome=1 时显示，用来演示「书签栏在哪」 -->
+<div id="chrome">
+  <div class="tabsrow">
+    <div class="tab"><i></i><span>6-1 示例：把列表去重 - 示例课程 · 编程练习</span></div>
+    <div class="newtab">+</div>
+  </div>
+  <div class="addrrow">
+    <span class="nav">← → ⟳</span>
+    <div class="addr"><span class="lock">🔒</span><span>pintia.example.edu/problem-sets/0000000000000000001/exam/problems/type/6</span></div>
+    <span class="nav">☆ ⋮</span>
+  </div>
+  <div class="bookmarks">
+    <div class="bm"><i>📄</i>新建标签页</div>
+    <div class="bm hot" id="bmHot"><i>🔖</i>逐字输入<span class="tag">← 点这里</span></div>
+    <div class="bm"><i>📁</i>课程资料</div>
+    <div class="bm"><i>📁</i>常用</div>
+  </div>
+</div>
+
+<div class="top">
+  <div class="logo">PTA<span>·</span>演示</div>
+  <div class="name">示例课程 · 编程练习（虚构演示页）</div>
+  <div class="userbox">
+    <span class="clock">剩余 58:12</span>
+    <div class="avatar">同</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="side">
+    <h4>函数题 5 / 5</h4>
+    <a class="on" href="#"><i>6-1</i>把列表去重</a>
+    <a href="#"><i>6-2</i>中缀转前缀</a>
+    <a href="#"><i>6-3</i>前缀表达式求值</a>
+    <a href="#"><i>6-4</i>反转队列</a>
+    <a href="#"><i>6-5</i>合并两条链表</a>
+  </div>
+
+  <div class="content">
+    <div class="tabs">
+      <a href="#">单选题 <em>6/6</em></a>
+      <a href="#">填空题 <em>3/3</em></a>
+      <a class="on" href="#">函数题 <em>5/5</em></a>
+    </div>
+
+    <div class="split">
+      <div class="left">
+        <h2 class="title">6-1 示例：把列表去重</h2>
+        <div class="meta">分数 <b>16</b>　作者 demo　单位 示例大学</div>
+
+        <div class="stem">
+          <p>读入一个整数列表，把它里面重复的元素去掉，返回去重后剩下几个元素。</p>
+          <p>你只需要实现下面这个函数，不要写输入输出。</p>
+
+          <h3>函数接口定义</h3>
+          <pre class="sample">def remove_duplicate(L):
+    # L 是一个整数列表，返回剩下元素的个数</pre>
+
+          <h3>输入样例</h3>
+          <pre class="sample">5
+1 2 3 4 4</pre>
+
+          <h3>输出样例</h3>
+          <pre class="sample">4</pre>
+
+          <div class="limit">代码长度限制 16 KB　时间限制 400 ms　内存限制 64 MB</div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="bar">
+          <span class="lang">Python (python3)</span>
+          <span class="sp"></span>
+          <button id="btnTest">测试用例</button>
+          <button id="btnSubmit" class="primary">提交本题作答</button>
+        </div>
+
+        <div class="editorWrap">
+          <div class="AnswerFormDemo">
+            <div class="cm-content" contenteditable="true" id="ed">def remove_duplicate(L):
+    # 在这里写你的代码
+    pass</div>
+          </div>
+        </div>
+
+        <div class="result" id="result">
+          <div class="head">运行结果</div>
+          <div>测试点 1：<span class="ok">通过</span></div>
+          <div>测试点 2：<span class="ok">通过</span></div>
+          <div>测试点 3：<span class="ok">通过</span></div>
+          <div>测试点 4：<span class="ok">通过</span></div>
+          <div>测试点 5：<span class="ok">通过</span></div>
+          <div class="head" style="margin-top:6px">5 / 5 全部通过</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- 演示用的假 CodeMirror 视图：只实现书签工具会用到的那一小块 ----
+  (function () {
+    var el = document.getElementById('ed');
+    var view = {
+      state: {
+        get doc() {
+          return {
+            get length() { return el.textContent.length; },
+            toString: function () { return el.textContent; }
+          };
+        }
+      },
+      dispatch: function (tr) {
+        var ch = (tr && tr.changes) || {};
+        el.textContent = String(ch.insert == null ? el.textContent : ch.insert);
+      }
+    };
+    // 真 PTA 就是挂在 cmTile.view 上，书签工具正是按这个找的
+    el.cmTile = { view: view };
+  })();
+
+  document.getElementById('btnTest').onclick = function () {
+    document.getElementById('result').classList.add('show');
+  };
+  document.getElementById('btnSubmit').onclick = function () {
+    alert('演示页：真实站点上这一步由你自己点。');
+  };
+
+  // ---- 截图辅助：?chrome=1 显示浏览器外框；window.__demo 提供摆拍接口 ----
+  (function () {
+    var q = new URLSearchParams(location.search);
+    if (q.get('chrome') === '1') {
+      document.getElementById('chrome').classList.add('on');
+      document.body.classList.add('hasChrome');
+      var setH = function () {
+        document.body.style.setProperty('--chrome-h',
+          document.getElementById('chrome').getBoundingClientRect().height + 'px');
+      };
+      setH(); window.addEventListener('resize', setH);
+    }
+
+    var cur = document.createElement('div');
+    cur.id = 'cursor';
+    cur.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 30" width="22" height="30">'
+      + '<path d="M2 1 L2 24 L8 18.5 L11.6 27 L15 25.4 L11.4 17 L19.5 16.6 Z" '
+      + 'fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+    document.body.appendChild(cur);
+
+    window.__demo = {
+      // 把示意指针摆到某个元素中心（或指定坐标）
+      point: function (sel, dx, dy, on) {
+        if (on === false) { cur.classList.remove('on'); return null; }
+        var b;
+        if (typeof sel === 'string') {
+          var el = document.querySelector(sel);
+          if (!el) return null;
+          b = el.getBoundingClientRect();
+        } else { b = sel; }
+        cur.style.left = (b.x + b.width / 2 + (dx || 0) - 2) + 'px';
+        cur.style.top = (b.y + b.height / 2 + (dy || 0) - 2) + 'px';
+        cur.classList.add('on');
+        return { x: b.x, y: b.y, w: b.width, h: b.height };
+      },
+      pointAt: function (x, y) {
+        cur.style.left = (x - 2) + 'px';
+        cur.style.top = (y - 2) + 'px';
+        cur.classList.add('on');
+      },
+      pointBm: function (on) { return window.__demo.point('#bmHot .tag', -34, -2, on); },
+      hideCursor: function () { cur.classList.remove('on'); },
+      // 打开「测试用例」结果区
+      showResult: function (on) {
+        document.getElementById('result').classList.toggle('show', on !== false);
+      },
+      // 代码框内容
+      getDoc: function () { return document.getElementById('ed').textContent; },
+      setDoc: function (t) { document.getElementById('ed').textContent = t; }
+    };
+  })();
+</script>
+</body>
+</html>

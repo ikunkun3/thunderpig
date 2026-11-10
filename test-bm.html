@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>书签工具 · 离线夹具</title>
+<style>
+body{background:#0b0d12;color:#e7e7ea;font:14px/1.7 "Microsoft YaHei",sans-serif;margin:0;padding:24px}
+h1{font-size:19px;margin:0 0 6px}
+.sub{color:#9aa0ab;font-size:13px;margin:0 0 18px}
+.case{background:#141821;border:1px solid #232a38;border-radius:10px;padding:14px 16px;margin:0 0 12px}
+.ok{color:#34d399}.bad{color:#f87171}.dim{color:#8b93a3}
+pre{background:#0f131a;border-radius:8px;padding:10px;font:12px/1.6 Consolas,monospace;
+    white-space:pre-wrap;word-break:break-all;margin:6px 0 0;color:#c4b5fd}
+.cm-content{background:#0b0d12;border:1px solid #2c3350;border-radius:8px;
+            padding:10px;font:13px/1.6 Consolas,monospace;min-height:60px;white-space:pre-wrap}
+#sum{font-size:15px;font-weight:700;margin:0 0 14px}
+</style></head><body>
+
+<h1>书签工具 · 离线夹具</h1>
+<p class="sub">复刻真 PTA 的题目区结构（<code>*AnswerForm*</code> 里一个编辑器 + 测试用例面板里一个）</p>
+
+<div id="sum">跑测试中…</div>
+<div id="out"></div>
+
+<!-- ========== 复刻 PTA 的题目区 ========== -->
+<div id="exam-app">
+  <div class="space-y-4" id="q632">
+    <div>6-1 (DS) Remove the duplicates in List</div>
+    <div>分数 16</div>
+    <div class="CodingProblemAnswerForm_JoDvx">
+      <div class="codeEditor_WDyZc">
+        <div class="cm-editor">
+          <div class="cm-gutters">1<br>2</div>
+          <div class="cm-content" contenteditable="true">def remove_duplicate(L):
+    return len(set(L))</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 测试用例面板：这里的编辑器不是答题区，绝不能挑中它 -->
+  <div class="testPanel">
+    <div class="cm-editor">
+      <div class="cm-content" contenteditable="true">1,2,3,4,4,5</div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.__ERRS__ = [];
+window.addEventListener('error', function (e) {
+  window.__ERRS__.push(e.message + ' @' + (e.filename || '') + ':' + e.lineno);
+});
+</script>
+
+<script src="书签工具.js?boot=1"></script>
+
+<script>
+(function () {
+  'use strict';
+  var pass = 0, fail = 0, out = document.getElementById('out');
+  var ID = 'pta-bm';
+  var Q = document.querySelector('#q632 .cm-content');
+  var n = 0;
+
+  function ck(name, cond, extra) {
+    var d = document.createElement('div');
+    d.className = 'case';
+    d.innerHTML = '<span class="' + (cond ? 'ok' : 'bad') + '">' + (cond ? '✓' : '✗') + '</span> ' + name
+      + (extra !== undefined && extra !== null
+        ? '<pre>' + String(extra).replace(/[<>&]/g, function (c) {
+            return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c];
+          }) + '</pre>' : '');
+    out.appendChild(d);
+    if (cond) pass++; else fail++;
+  }
+
+  function panel() { return document.getElementById(ID); }
+  function ta() { var w = panel(); return w ? w.querySelector('textarea') : null; }
+  function st() { var w = panel(); return w ? w.querySelector('.st') : null; }
+
+  // 重新跑一次书签脚本 = 在真浏览器里再点一次书签。
+  // 用新的 <script> 元素逐次加载，保证拿到的是最新文件（不是缓存）。
+  function runBM() {
+    return new Promise(function (resolve) {
+      var s = document.createElement('script');
+      s.src = '书签工具.js?t=' + (++n);
+      s.onload = function () { resolve(true); };
+      s.onerror = function () { resolve(false); };
+      document.head.appendChild(s);
+    });
+  }
+
+  // 每项测试前：清掉浮层、把编辑器恢复成草稿
+  function reset() {
+    var w = panel();
+    if (w) w.parentNode.removeChild(w);
+    Q.textContent = 'def remove_duplicate(L):\n    return len(set(L))';
+    Q.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function writeWith(code) {
+    var w = panel();
+    if (!w) return { st: null, cls: null, doc: Q.textContent, err: 'no-panel' };
+    var t = w.querySelector('textarea');
+    t.value = code;
+    w.querySelector('.go').click();
+    var s = w.querySelector('.st');
+    return { st: s.textContent, cls: s.className, doc: Q.textContent };
+  }
+
+  (async function () {
+    // ——— 第 1 组：出现与结构 ———
+    ck('第一次点书签，页面上出现浮层', !!panel());
+    ck('浮层里有输入框和「写进代码框」按钮', !!(ta() && panel().querySelector('.go')));
+    ck('初始状态提示按 Ctrl+Enter',
+       !!(st() && st().textContent.indexOf('Ctrl+Enter') >= 0), st() && st().textContent);
+    ck('浮层自己带样式（不依赖站点 CSS）',
+       !!document.querySelector('style#pta-bm-style') ||
+       [].slice.call(document.querySelectorAll('style'))
+         .some(function (s) { return s.textContent.indexOf('#pta-bm .box') >= 0; }));
+    ck('按钮文案写明「只写字，不点保存、不点提交」',
+       panel().textContent.indexOf('不点提交') >= 0);
+
+    // ——— 第 2 组：再点一次 = 关掉 ———
+    await runBM();
+    ck('再点一次书签会把浮层关掉', !panel());
+    await runBM();
+    ck('关掉之后再点一次，浮层又回来了', !!panel());
+
+    // ——— 第 3 组：选对编辑器 ———
+    reset(); await runBM();
+    var r1 = writeWith('def remove_duplicate(L):\n    return len(set(L))');
+    ck('写进答题区（不是测试用例面板）',
+       !!(r1.st && r1.st.indexOf('✓') === 0), JSON.stringify(r1));
+    ck('测试用例面板的内容没被动过',
+       document.querySelector('.testPanel .cm-content').textContent === '1,2,3,4,4,5',
+       document.querySelector('.testPanel .cm-content').textContent);
+    ck('成功时状态行是绿色（class 带 ok）', !!(r1.cls && r1.cls.indexOf('ok') >= 0), r1.cls);
+    ck('状态行报了字符数', !!(r1.st && r1.st.indexOf('47') >= 0), r1.st);
+
+    // ——— 第 4 组：各种内容 ———
+    // contenteditable 不保留文件末尾的换行，末尾空行对判题也没影响。
+    // 所以比对用 norm()（去行尾空白 + 去末尾空行），和脚本事后核对用的是同一套规则。
+    function normLite(s) {
+      return String(s).replace(/\r\n?/g, '\n')
+        .split('\n').map(function (l) { return l.replace(/\s+$/, ''); })
+        .join('\n').replace(/\n+$/, '');
+    }
+    reset(); await runBM();
+    var py = 'import sys\n\ndef solve(nums, k):\n    nums.sort(reverse=True)\n    return sum(nums[:k])\n\nif __name__ == "__main__":\n    data = sys.stdin.read().split()\n    n, k = int(data[0]), int(data[1])\n    print(solve([int(x) for x in data[2:2+n]], k))\n';
+    writeWith(py);
+    ck('多行 Python（含空行、缩进、import）一字不差',
+       normLite(Q.textContent) === normLite(py),
+       'want ' + normLite(py).length + ' / got ' + normLite(Q.textContent).length);
+
+    reset(); await runBM();
+    var cn = 'def f(x):\n    """统计中文字符个数。"""\n    return sum(1 for c in x if "\u4e00" <= c <= "\u9fff")\n';
+    writeWith(cn);
+    ck('中文注释与字符串一字不差',
+       normLite(Q.textContent) === normLite(cn), Q.textContent);
+
+    reset(); await runBM();
+    var tabs = 'def f():\n\treturn 1\n';
+    writeWith(tabs);
+    ck('制表符原样保留（不换成空格）',
+       normLite(Q.textContent) === normLite(tabs), JSON.stringify(Q.textContent));
+
+    reset(); await runBM();
+    writeWith('a = 1\r\nb = 2\r\n');
+    ck('CRLF 被规整成 LF',
+       normLite(Q.textContent) === 'a = 1\nb = 2', JSON.stringify(Q.textContent));
+
+    reset(); await runBM();
+    writeWith('');
+    ck('空内容被拒绝，且没动代码框',
+       Q.textContent.indexOf('remove_duplicate') >= 0);
+
+    // ——— 第 5 组：覆盖而非追加 ———
+    reset(); await runBM();
+    writeWith('x = 1');
+    ck('写第二次是整体覆盖，不是往后追加', Q.textContent === 'x = 1', JSON.stringify(Q.textContent));
+
+    // ——— 第 6 组：没有编辑器时 ———
+    reset();
+    var saved = Q.parentNode;
+    var holder = document.createElement('div');
+    saved.parentNode.insertBefore(holder, saved);
+    saved.parentNode.removeChild(saved);      // 把答题区临时摘掉
+    var form = document.querySelector('[class*="AnswerForm"]');
+    if (form) form.parentNode.removeChild(form);   // 表单本身也拿掉，模拟"不在编程题页"
+    await runBM();
+    var r8 = writeWith('y = 2');
+    ck('没有代码框时给出提示，不抛异常，也不乱写',
+       !!(r8.st && r8.st.indexOf('没找到') >= 0), r8.st);
+    holder.parentNode.insertBefore(saved, holder);   // 放回去
+    holder.parentNode.removeChild(holder);
+
+    // ——— 第 7 组：保命项 ———
+    var src = await (await fetch('书签工具.js?t=999')).text();
+    var code = src.replace(/\/\*[\s\S]*?\*\//g, '')
+                  .split('\n').map(function (l) { return l.split('//')[0]; }).join('\n');
+    ck('一行 .click( 都没有（绝不点页面上的任何按钮）', code.indexOf('.click(') < 0);
+    ck('不联网（无 fetch( / XMLHttpRequest）',
+       code.indexOf('fetch(') < 0 && code.indexOf('XMLHttpRequest') < 0);
+    ck('不读剪贴板（无 clipboardData / paste 事件监听）',
+       code.indexOf('clipboardData') < 0 && code.indexOf("'paste'") < 0);
+    ck('没有 GM_ 开头的东西（所以不需要油猴）', code.indexOf('GM_') < 0);
+    ck('没有 document.write', code.indexOf('document.write') < 0);
+
+    var sum = document.getElementById('sum');
+    sum.innerHTML = '<span class="' + (fail ? 'bad' : 'ok') + '">'
+      + (fail ? '✗ ' + fail + ' 项失败' : '✓ 全部通过')
+      + '</span> <span class="dim">（' + pass + ' ✓ / ' + fail + ' ✗）</span>'
+      + (window.__ERRS__.length
+        ? ' <span class="bad">页面错误 ' + window.__ERRS__.length + ' 条：'
+          + window.__ERRS__.join(' / ') + '</span>' : '');
+    window.__BM_TEST__ = { pass: pass, fail: fail, errs: window.__ERRS__ };
+  })();
+})();
+</script>
+</body></html>

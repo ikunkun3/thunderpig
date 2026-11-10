@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>新手教程 · PTA 逐字输入</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;padding:36px 20px 80px;background:#0f1115;color:#e6e8ee;
+       font:15px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+  .wrap{max-width:760px;margin:0 auto}
+
+  h1{font-size:26px;margin:0 0 8px;letter-spacing:.5px}
+  .sub{color:#9aa3b2;margin:0 0 10px;font-size:14.5px}
+  .meta{color:#5f6875;font-size:12.5px;margin:0 0 34px}
+
+  /* 顶部三件事 */
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 34px}
+  .card{background:#171a21;border:1px solid #262b36;border-radius:12px;padding:16px 16px 14px}
+  .card .big{font-size:22px;line-height:1;margin-bottom:10px}
+  .card b{display:block;font-size:14px;margin-bottom:4px}
+  .card span{color:#8b95a6;font-size:12.5px;line-height:1.6}
+
+  /* 步骤 */
+  .step{background:#171a21;border:1px solid #262b36;border-radius:14px;padding:22px 24px;margin-bottom:18px}
+  .step h2{font-size:18px;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  .n{display:inline-flex;width:28px;height:28px;border-radius:50%;background:#7c3aed;color:#fff;
+     font-size:14px;font-weight:700;align-items:center;justify-content:center;flex:0 0 auto}
+  .step .lead{color:#8b95a6;font-size:13px;margin:0 0 14px 38px}
+  .step p{margin:10px 0;color:#b6bdc9;font-size:14.2px}
+  .step ol,.step ul{margin:10px 0;padding-left:22px;color:#b6bdc9;font-size:14.2px}
+  .step li{margin:7px 0}
+  b,strong{color:#e6e8ee}
+
+  .btn{display:inline-block;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;
+       font-size:14px;margin:8px 8px 4px 0;border:1px solid transparent;cursor:pointer}
+  .btn.p{background:#7c3aed;color:#fff}
+  .btn.p:hover{background:#6d28d9}
+  .btn.g{background:#232833;color:#e6e8ee;border-color:#39404f}
+  .btn.g:hover{background:#2c3340}
+
+  code{background:#232833;padding:2px 6px;border-radius:4px;font-size:13px;color:#c4b5fd}
+  .file{background:#232833;border-left:3px solid #7c3aed;padding:10px 14px;border-radius:6px;
+        font:13px/1.6 Consolas,monospace;color:#c4b5fd;margin:12px 0;display:flex;align-items:center;gap:8px}
+  .file b{font-weight:600}
+
+  .see{background:#0f1d17;border-left:3px solid #34d399;padding:10px 14px;border-radius:6px;
+       color:#a7f3d0;font-size:13.2px;margin:12px 0}
+  .see::before{content:"✅ 你应该看到：";color:#34d399;font-weight:600}
+  .warn{background:#2a1f14;border-left:3px solid #d97706;padding:10px 14px;border-radius:6px;
+        color:#fbbf24;font-size:13.2px;margin:12px 0}
+  .warn::before{content:"⚠ "}
+  .stop{background:#2a1416;border-left:3px solid #ef4444;padding:10px 14px;border-radius:6px;
+        color:#fca5a5;font-size:13.2px;margin:12px 0}
+
+  /* 模拟浏览器工具栏 */
+  .mockbar{background:#1c2029;border:1px solid #2a2f3a;border-radius:10px;padding:9px 12px;
+           display:flex;align-items:center;gap:10px;margin:14px 0;font-size:12.5px;color:#6b7280}
+  .dot{width:10px;height:10px;border-radius:50%;background:#333a47;flex:0 0 auto}
+  .addr{flex:1;background:#11141a;border:1px solid #262b36;border-radius:6px;padding:5px 10px;
+        color:#7b8494;font:12px/1.4 Consolas,monospace;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .toolicon{width:24px;height:24px;border-radius:6px;background:#232833;border:1px solid #39404f;
+            display:flex;align-items:center;justify-content:center;font-size:13px;flex:0 0 auto}
+  .pulse{box-shadow:0 0 0 3px rgba(124,58,237,.35);border-color:#7c3aed}
+
+  /* 模拟面板 */
+  .mockpanel{width:300px;background:#4c1d95;border-radius:10px;overflow:hidden;
+             box-shadow:0 12px 30px rgba(0,0,0,.45);margin:14px 0;font-size:12px}
+  .mockpanel .hd{background:#5b21b6;color:#fff;padding:7px 10px;font-weight:600;
+                 display:flex;justify-content:space-between;align-items:center;font-size:12.5px}
+  .mockpanel .bd{padding:10px;background:#3b1580}
+  .mockpanel .ta{background:#2e1065;border:1px solid #6d28d9;border-radius:6px;
+                 padding:8px;color:#ddd6fe;font:11.5px/1.55 Consolas,monospace;min-height:74px;white-space:pre}
+  .mockpanel .row{display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap}
+  .mockpanel .ctl{background:#3b1580;border:1px solid #6d28d9;color:#ddd6fe;border-radius:5px;
+                  padding:3px 8px;font-size:11px}
+  .mockpanel .go{background:#7c3aed;border-color:#8b5cf6;color:#fff}
+  .mockpanel .st{background:#2e1065;border-radius:5px;padding:5px 8px;margin-top:8px;
+                 color:#6ee7b7;font-size:11px}
+
+  /* 标注 */
+  .anno{background:#141821;border:1px dashed #333a47;border-radius:10px;padding:16px 18px;margin:16px 0}
+  .anno h4{margin:0 0 10px;font-size:13.5px;color:#9aa3b2;font-weight:600;letter-spacing:.3px}
+  .anno dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:baseline}
+  .anno dt{color:#c4b5fd;font-weight:600;font-size:13px;white-space:nowrap}
+  .anno dd{margin:0;color:#a5aebc;font-size:13px}
+
+  /* 表格 */
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.2px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #262b36;vertical-align:top}
+  th{color:#8b95a6;font-weight:600;font-size:12.5px;background:#141821}
+  td:first-child{color:#e6e8ee;white-space:nowrap}
+  td{color:#a5aebc}
+  tbody tr:hover{background:#141821}
+
+  .check{background:#141821;border:1px solid #262b36;border-radius:10px;padding:16px 20px;margin:16px 0}
+  .check label{display:block;padding:7px 0;color:#b6bdc9;font-size:14px;cursor:pointer}
+  .check input{margin-right:9px;transform:scale(1.15);accent-color:#7c3aed}
+
+  details{margin-top:14px}
+  summary{cursor:pointer;color:#9aa3b2;font-size:13px;user-select:none}
+  summary:hover{color:#c4b5fd}
+
+  .foot{color:#5f6875;font-size:12px;margin-top:34px;text-align:center;line-height:1.9}
+  .kbd{background:#232833;border:1px solid #39404f;border-bottom-width:2px;border-radius:5px;
+       padding:1px 7px;font:12px Consolas,monospace;color:#c4b5fd}
+  @media(max-width:640px){.three{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>新手教程 · PTA 逐字输入</h1>
+  <p class="sub">从「什么都没有」到「代码躺在 PTA 的代码框里」：<b>装油猴走第 1～6 步</b>（约 6 分钟）；<b>不想装扩展就直接看第 7 步</b>，双击一个 exe 就行（约 1 分钟）。</p>
+  <p class="meta">纯本地运行 · 不联网 · 不上传 · 不读你的题目 · 不替你点提交</p>
+
+  <div class="three">
+    <div class="card">
+      <div class="big">🐒</div>
+      <b>装一个扩展</b>
+      <span>油猴（Tampermonkey），负责让脚本在 PTA 上跑</span>
+    </div>
+    <div class="card">
+      <div class="big">⌨</div>
+      <b>装一个脚本</b>
+      <span>双击一下，浏览器自己弹安装页</span>
+    </div>
+    <div class="card">
+      <div class="big">📋</div>
+      <b>粘 → 敲 → 交</b>
+      <span>答案粘进面板，点「敲进去」，自己点提交</span>
+    </div>
+  </div>
+
+  <!-- ============ 两条路 ============ -->
+  <div class="step">
+    <h2><span class="n">A</span>先挑一条路：装扩展，或者用 exe</h2>
+    <p class="lead">两个办法做的是同一件事，选一个就行。</p>
+    <table>
+      <tr><th style="width:22%"></th><th>方案 A · 油猴脚本</th><th>方案 B · 独立 exe</th></tr>
+      <tr><td>要装几样东西</td><td>两样：Tampermonkey + 脚本</td><td>一样：双击 <b>哇嘞哇嘞大雷猪.exe</b></td></tr>
+<tr><td>窗口会不会挡住题目</td><td>会浮在页面上，可以拖动、点 × 收起</td><td>默认置顶，去掉「置顶」勾或按 Ctrl+T 就缩到后面</td></tr>
+      <tr><td>怎么用</td><td>打开题目，面板自己弹出来，粘完点「敲进去」</td><td>粘代码 → 点「开始敲」→ 3 秒内切到浏览器</td></tr>
+      <tr><td>要点一下代码框吗</td><td><b>不用</b>，脚本直接写进编辑器</td><td><b>要</b>，先点一下让光标在里面</td></tr>
+      <tr><td>会不会敲错地方</td><td>不会，它只认 PTA 页面</td><td>有风险 —— 它敲的是「当前最前面的窗口」，所以启动前会检查是不是浏览器，不是就直接取消</td></tr>
+      <tr><td>杀毒软件</td><td>基本不报</td><td>可能会报（模拟键盘的行为和某些外挂太像），Windows 也可能弹「已保护你的电脑」</td></tr>
+      <tr><td>适合谁</td><td>自己电脑、常用</td><td>不想装扩展、机房电脑不让装扩展</td></tr>
+    </table>
+    <p style="margin-top:14px"><b>能装扩展就用方案 A</b>，最省心、不会敲错地方。<b>实在装不了扩展，用方案 B。</b></p>
+    <p style="font-size:13px;color:#7b8494">下面第 1～6 步是方案 A 的完整流程；方案 B 在第 7 步，只有 4 行，可以直接跳过去看。</p>
+  </div>
+
+  <!-- ============ 第 1 步 ============ -->
+  <div class="step">
+    <h2><span class="n">1</span>先确认你用的是 Chrome 或 Edge</h2>
+    <p class="lead">别的浏览器也能用，但这两家最省事。</p>
+    <p>在浏览器右上角找「三个点」菜单 → <b>设置</b> → <b>关于</b>，第一行就写着浏览器名字和版本。<b>版本 100 以上</b>就行，不用管具体数字。</p>
+    <div class="see">页面能正常打开 PTA、能登录、能看到题目 —— 这一条就够了。</div>
+    <p style="font-size:13px;color:#7b8494">用 Firefox 也行，只是装油猴要去它自己的插件站，下面两个商店链接对你不适用。</p>
+  </div>
+
+  <!-- ============ 第 2 步 ============ -->
+  <div class="step">
+    <h2><span class="n">2</span>装油猴（Tampermonkey）</h2>
+    <p class="lead">一个浏览器扩展。装过一次就永远不用再装。</p>
+    <p>点下面任意一个按钮，跳到官方商店，点 <b>「获取」/「添加到 Chrome」</b> → 弹窗点 <b>「添加扩展程序」</b>。</p>
+    <a class="btn p" href="https://microsoftedge.microsoft.com/addons/detail/iikmkjmpaadaobahmlepeloendndfphd" target="_blank" rel="noopener">Edge 商店安装</a>
+    <a class="btn g" href="https://chromewebstore.google.com/detail/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank" rel="noopener">Chrome 商店安装</a>
+
+    <p style="margin-top:16px">装完之后，浏览器右上角会多出一个<b>猴子头（或者拼图块里的猴子）</b>图标。找不到就点一下拼图块 🧩，把猴子旁边的图钉按下去，它就常驻了。</p>
+
+    <div class="mockbar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="addr">https://pintia.cn/problem-sets/...</span>
+      <span class="toolicon">🧩</span>
+      <span class="toolicon pulse">🐒</span>
+    </div>
+
+    <div class="see">点一下那个猴子图标，能弹出一个小菜单，里面有「管理面板 / 添加新脚本」这几项。</div>
+    <div class="warn">如果点猴子图标毫无反应、或者菜单里一片空白 —— 说明扩展被浏览器禁用了，去 <code>chrome://extensions</code>（Edge 是 <code>edge://extensions</code>）把它打开。</div>
+  </div>
+
+  <!-- ============ 第 3 步 ============ -->
+  <div class="step">
+    <h2><span class="n">3</span>装「PTA 逐字输入」这个脚本</h2>
+    <p class="lead">双击一个文件，30 秒搞定。</p>
+    <p>在你解压出来的这个文件夹里，找到并<b>双击</b>：</p>
+    <div class="file"><b>一键安装.bat</b></div>
+    <p>会弹出一个黑色窗口（一闪就关是正常的），紧接着浏览器自动打开一个安装页，上面有一个绿色的 <b>【安装】</b> 按钮，点它。</p>
+
+    <div class="see">油猴弹出「已安装」提示；点猴子图标 → 管理面板，列表里出现一行 <b>「PTA 逐字输入（禁粘贴也能进）」</b>，左边开关是打开状态。</div>
+
+    <div class="warn">如果浏览器里打开的是一整页代码、找不到「安装」按钮 —— 第 2 步的油猴没装好，回去装完，再双击一次 <code>一键安装.bat</code>。</div>
+
+    <details>
+      <summary>双击没反应 / 系统不让运行 bat？点这里手动装</summary>
+      <p style="margin-top:10px">打开 <code>安装.html</code>，往下翻到底部展开「手动装」，点「复制脚本内容」，然后：</p>
+      <ol style="margin-top:6px">
+        <li>点猴子图标 → <b>管理面板</b> → 左上角 <b>+</b>（添加新脚本）</li>
+        <li>把编辑框里原有的内容<b>全选删掉</b></li>
+        <li>粘贴 → 按 <span class="kbd">Ctrl</span>+<span class="kbd">S</span> 保存</li>
+      </ol>
+    </details>
+  </div>
+
+  <!-- ============ 第 4 步 ============ -->
+  <div class="step">
+    <h2><span class="n">4</span>打开 PTA 的编程题页面</h2>
+    <p class="lead">必须是「能填代码」的那一页。</p>
+    <p>登录 PTA → 进入你的作业/考试 → 左边题目列表里点<b>函数题 / 编程题</b>。判断标准很简单：<b>页面右边有一个黑色的代码编辑框</b>，框里可能已经有一段灰色模板。</p>
+    <div class="see">右下角（或右上角）自动弹出一块紫色面板，标题写着「PTA 逐字输入」。</div>
+    <div class="warn">面板没弹出来？先把这一页刷新一次（<span class="kbd">F5</span>）。还是不出来就看下面「出问题怎么办」第 3 条。</div>
+    <p style="font-size:13px;color:#7b8494">注意：选择题、填空题页面不会弹面板 —— 那些题用不着敲代码，这个脚本也不管它们。</p>
+  </div>
+
+  <!-- ============ 第 5 步 ============ -->
+  <div class="step">
+    <h2><span class="n">5</span>用面板把代码「敲」进去</h2>
+    <p class="lead">就三下：粘、点、等。</p>
+
+    <ol>
+      <li>把你的代码<b>粘进面板里那个大框</b>（不是右边 PTA 的框，是面板里的框）。在面板里按 <span class="kbd">Ctrl</span>+<span class="kbd">V</span> 或右键粘贴都行 —— 这个框是我们自己的，PTA 的禁粘贴拦不到。</li>
+      <li>速度保持默认的 <b>快（8ms）</b> 就可以。想看着它慢慢敲，选 <b>正常（30ms）</b>。</li>
+      <li>点 <b>「敲进去」</b>（或者在面板里按 <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span>）。</li>
+    </ol>
+
+    <div class="mockpanel">
+      <div class="hd"><span>⌨ PTA 逐字输入</span><span>×</span></div>
+      <div class="bd">
+        <div class="ta">def remove_duplicate(L):
+    return len(set(L))</div>
+        <div class="row">
+          <span class="ctl">快 (8ms) ▾</span>
+          <span class="ctl go">敲进去</span>
+          <span class="ctl">停下</span>
+          <span class="ctl">读一下</span>
+          <span class="ctl">清空</span>
+        </div>
+        <div class="st">✓ 47 个字符全部写入（cm 路线 · 0.5s）· 未点任何按钮</div>
+      </div>
+    </div>
+
+    <div class="anno">
+      <h4>面板上每个东西是干什么的</h4>
+      <dl>
+        <dt>大框</dt><dd>放代码的地方。粘贴只往这里粘。</dd>
+        <dt>速度</dt><dd>每个字符之间隔多久。极快=瞬间、快=8ms、正常=30ms、慢=100ms。</dd>
+        <dt>敲进去</dt><dd>开始写。会先清空 PTA 的代码框，再从第一个字符写起。</dd>
+        <dt>停下</dt><dd>中途想中断就点它，已写进去的会留在那儿。</dd>
+        <dt>读一下</dt><dd>读出 PTA 代码框里现在到底是几个字符、走的是哪条通道。核对用。</dd>
+        <dt>清空</dt><dd>只清面板里的大框，不动 PTA 的代码框。</dd>
+        <dt>状态行</dt><dd>绿色 ✓ = 写完了；红色 ❌ = 没写成，后面会告诉你原因。</dd>
+        <dt>面板挡住题目</dt><dd>按住面板顶部标题栏可以把它拖到别处；点 × 关掉后，点右下角「⌨ 逐字输入」能再叫出来。</dd>
+      </dl>
+    </div>
+
+    <div class="see">PTA 右边的代码框里出现了你的代码，缩进和换行都对；面板状态行变成绿色的「✅ … 个字符全部写入」。</div>
+
+    <div class="warn">写完先看一眼代码框第 1 行，Python 的缩进错一个空格就会报错。不放心就点「读一下」，它会告诉你框里现在有多少字符。</div>
+  </div>
+
+  <!-- ============ 第 6 步 ============ -->
+  <div class="step">
+    <h2><span class="n">6</span>自己点「提交本题作答」</h2>
+    <p class="lead">这一步脚本<b>绝对不会</b>替你做。</p>
+    <p>确认代码没问题，自己点页面上的 <b>「运行测试」</b> 先跑一遍样例，通过了再点 <b>「提交本题作答」</b>。</p>
+    <div class="stop">这个脚本一行提交代码都没有。它只会往编辑框里写字，不会点保存、提交、交卷、结束考试里的任何按钮 —— 你自己看了再交。</div>
+  </div>
+
+  <!-- ============ 第 7 步：方案 B ============ -->
+  <div class="step">
+    <h2><span class="n">7</span>方案 B：不装油猴，用 exe（哇嘞哇嘞大雷猪）</h2>
+    <p class="lead">双击 <b>哇嘞哇嘞大雷猪.exe</b> 就有窗口，不用装任何扩展，也不用换浏览器。</p>
+
+    <div class="see" style="display:block">
+      <b>这软件是干什么的</b><br>
+      把代码一个字一个字敲进 PTA 的代码框。敲的是<b>真实按键</b>，不是粘贴，所以 PTA 的「禁止粘贴」拦不到。<br>
+      不联网 · 不读剪贴板 · 不替你点任何按钮 —— 题目还是你自己提交。
+    </div>
+
+    <p><b>第一次打开可能会被 Windows 拦一下</b>：屏幕出现蓝色的「Windows 已保护你的电脑」。点左边那行小字 <b>「更多信息」</b>，再点 <b>「仍要运行」</b>。这是因为它会模拟键盘，被杀毒软件当成可疑程序了 —— 它不联网、不读文件，代码全在同一个 exe 里。</p>
+
+    <ol style="margin:14px 0 14px 22px;line-height:2">
+      <li><b>双击 exe</b>。代码可以粘进上面那个黑框（Ctrl+V 没问题，这个框是它自己的，不禁粘贴），<b>也可以什么都不粘</b> —— 只要你先复制好了，点「开始敲」时它会自己从剪贴板取</li>
+      <li>浏览器打开 PTA 那道编程题，<b>用鼠标点一下右边黑色代码框</b>，让光标在里面闪</li>
+      <li>回 exe，点紫色的 <b>「开始敲」</b>，弹的确认框点「确定」</li>
+      <li><b>倒计时结束前切到浏览器</b>（秒数自己调，默认 3 秒），然后<b>手离开键盘和鼠标</b>，看着它一个字一个字打进去</li>
+      <li>打完了自己点「运行测试」→「提交本题作答」</li>
+    </ol>
+
+    <div class="see" style="display:block">忘了怎么用就点右上角那个紫色的 <b>?</b>，四步用法写在那儿 —— 所以只发这一个 exe 也够，不用配说明书。</div>
+
+    <div class="see">切回浏览器后，能看到代码框里以大约每字 8 毫秒的速度正在被填写；exe 底部状态变成绿色的「✅ 全部敲完」。</div>
+
+    <div class="warn"><b>它会检查最前面的窗口是不是浏览器</b>。如果当时最前面是游戏、微信、终端之类，它会直接取消并告诉你「一个字都没发出去」—— 这是保险，别绕过它。真要敲，就先把浏览器切到最前面。</div>
+
+    <div class="stop">敲的过程中<b>别碰键盘鼠标</b>。它是在模拟真实的按键，此刻你按的任何键也会一起进到代码框里，代码就乱了。要中途停，就点 exe 上的「停止」——已经敲进去的部分会留着，不会自动撤销。</div>
+
+    <div class="warn">代码里如果有 <b>制表符（Tab）</b>，程序会先提醒你。有些编辑器把 Tab 当成「切换焦点」，一按下去光标就跑了，后面的字会全部打飞。遇到提醒就点「取消」，把 Tab 换成 4 个空格再来。</div>
+
+    <p><b>窗口默认是「置顶」的</b>，也就是它会一直浮在浏览器上面，方便你边看代码边敲。觉得挡事就把 <b>「置顶」</b>那个勾去掉（或按 Ctrl+T 切换），它会乖乖缩到后面去。关掉再打开时，位置、大小和置顶状态都记得住。</p>
+
+    <p><b>倒计时秒数也能自己改</b>。控制条上有个 <b>「等待 [3] 秒」</b>，就是点「开始敲」之后给你多少秒切到浏览器。手快的调到 1 秒，要慢慢找代码框的调到 10 秒，填 <b>0</b> 就完全不倒数（先把光标点好再点「开始敲」）。这个数字关掉再开也记得住。</p>
+
+    <div class="ok">如果觉得<b>字发灰、笔画粘连</b>，或者窗口小得可怜 —— 那是 1.2.0 及更早版本在高分屏（125% / 150% 缩放）上的毛病：程序没声明自己是「DPI 感知」的，Windows 就把它当老程序，先按 96 DPI 画一遍再把整张图放大。1.2.1 已修，换成新 exe 就好；旧配置文件里的窗口大小会在启动时按当前 DPI 自动放大一档，你拖过的位置不变。</div>
+
+    <div class="ok">如果敲出来的<b>缩进变成双倍</b>（`def f():` 下面那行空了 8 格而不是 4 格）—— 那是 PTA 的代码框自己在按 Enter 后补了缩进，老版本又照着你的原文再敲一遍。1.2.2 已修：每次换行后先把编辑器补的那段删掉再照原文敲。别用 1.2.1 及更早的旧 exe。</div>
+
+    <div class="ok">1.3.0 又加了个<b>「PTA 模式」</b>（默认开着，控制条上那个勾）。既然网页已经白送了缩进，就不用再敲一遍：程序先算下一行原文有几个空格、再预测编辑器会给几个，<b>两个数一样就跳过原文那几个空格</b>，直接接着敲正文；<b>不一样就退回老办法</b>，删掉编辑器给的照原文敲。两种结果都对，前者省按键 —— 183 个字符的样例省了 32 个空格。顺便还处理了 PTA 的括号自动补全（敲 <code>(</code> 会自己补 <code>)</code>），不然 `x = [` 回车会多出一行收尾括号。</div>
+
+    <div class="ok">1.3.1 修了一个<b>会静默写坏代码</b>的问题，值得单独说一下。1.3.0 的 PTA 模式以为「普通语句按 Enter 之后编辑器会把缩进退回去」，所以把这种行预测成 0 格。实际上 PTA 的代码框<b>从不反缩进</b>：在 <code>def f():</code> 里面敲完一行 <code>    return 1</code> 再回车，新行还是 4 格。于是</div>
+
+    <pre style="background:#0b0d12;color:#c4b5fd;padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:13px;line-height:1.55">def f():
+    return 1
+x = 2</pre>
+
+    <div class="ok" style="margin-top:8px">敲出来会变成 <code>x = 2</code> 也缩进 4 格 —— 粘进编辑器里<b>看不出错</b>，运行才报 <code>IndentationError</code>。现在规则改成「非块头的行一律保持和上一行一样深」，只有 <code>def</code> / <code>if</code> / <code>for</code> / <code>while</code> / <code>with</code> / <code>try</code> / <code>class</code> 这类块头才 +4 格；<code>else:</code> / <code>elif</code> / <code>except</code> / <code>finally</code> 这四种网页行为实测不一致（顶格 <code>else:</code> 给 4 格、顶格 <code>except:</code> 给 0 格），程序干脆不猜，直接走「删掉重敲」。总之<b>不管哪条路，写进去的都是你原文的样子</b>。</div>
+
+    <p style="font-size:13px;color:#7b8494">exe 版本和油猴版本的区别：exe 打的是「当前最前面的窗口」，所以它必须靠你先把光标放进代码框；油猴版本是直接写进 PTA 的编辑器，不需要点，也不会打错地方。</p>
+  </div>
+
+  <!-- ============ 自检 ============ -->
+  <div class="step">
+    <h2><span class="n">✓</span>自检清单</h2>
+    <p class="lead">三条都打勾，说明一切正常。</p>
+    <div class="check">
+      <label><input type="checkbox"> 浏览器右上角有猴子图标，点开有菜单</label>
+      <label><input type="checkbox"> 油猴管理面板里能看到「PTA 逐字输入」，开关是开的</label>
+      <label><input type="checkbox"> 打开 PTA 编程题页面，紫色面板自动弹出来，状态行写着「已就绪」</label>
+    </div>
+    <p style="font-size:13px;color:#7b8494">这条清单是给你自己看的，勾了不会保存，刷新就重置 —— 不用在意。</p>
+  </div>
+
+  <!-- ============ FAQ ============ -->
+  <div class="step">
+    <h2><span class="n">?</span>出问题怎么办</h2>
+    <p class="lead">按症状查，一行一行对。</p>
+    <table>
+      <thead><tr><th>你看到的</th><th>原因</th><th>怎么办</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>双击 exe，蓝屏提示「Windows 已保护你的电脑」</td>
+          <td>它在模拟键盘，被杀毒软件当成了可疑程序</td>
+          <td>点「更多信息」→「仍要运行」。它不联网、不读文件，代码全在这一个 exe 里</td>
+        </tr>
+        <tr>
+          <td>exe 说「最前面不是浏览器，一个字都没发出去」</td>
+          <td>当时最前面的窗口是别的程序（游戏、微信、终端…）</td>
+          <td>先把浏览器点到最前面，再回 exe 点「开始敲」。别关掉这个检查</td>
+        </tr>
+        <tr>
+          <td>exe 敲到一半就停了，或者字打到了别的地方</td>
+          <td>中途碰了键盘鼠标，或光标从代码框跑掉了；Tab 键也可能把焦点顶出去</td>
+          <td>检查有没有混进制表符（换成 4 空格）；重新点一下代码框，再敲一次（勾着「先清空」会覆盖掉乱的那部分）</td>
+        </tr>
+        <tr>
+          <td>exe 窗口挡住了题目，看不清要敲什么</td>
+          <td>它默认是「置顶」的，会一直浮在浏览器上面</td>
+          <td>把窗口拖到旁边，或去掉「置顶」那个勾（快捷键 Ctrl+T）。关掉再开它会记住位置和置顶状态</td>
+        </tr>
+        <tr>
+          <td>双击 bat 只看到满屏代码</td>
+          <td>油猴没装好，或者装在了另一个浏览器上</td>
+          <td>确认 bat 打开的是你装了油猴的那个浏览器；先按第 2 步装好油猴，再双击一次</td>
+        </tr>
+        <tr>
+          <td>安装页没有「安装」按钮</td>
+          <td>同上；或者装的是别的脚本管理器但它被禁用了</td>
+          <td>去 <code>chrome://extensions</code> 看油猴是不是「已启用」；或按第 3 步的手动方式装</td>
+        </tr>
+        <tr>
+          <td>紫色面板不出现</td>
+          <td>① 不在编程题页面 ② 之前点过 × ③ 脚本被禁用 ④ 页面没加载完</td>
+          <td>先刷新页面；看右下角有没有「⌨ 逐字输入」小按钮，点它能叫回面板；确认题目是函数题/编程题</td>
+        </tr>
+        <tr>
+          <td>点「敲进去」提示 ❌ 找不到编辑器</td>
+          <td>代码框还在加载</td>
+          <td>等一两秒，先用鼠标点一下 PTA 的代码框，再点一次「敲进去」</td>
+        </tr>
+        <tr>
+          <td>提示 ❌ 三条路都试过，编辑器里不是这段代码</td>
+          <td>极少见的页面版式，或者页面刚刷新过</td>
+          <td>先点「读一下」看框里现在有什么；把速度调到「正常」或「慢」再试一次；还不行就刷新页面重来</td>
+        </tr>
+        <tr>
+          <td>写进去了但缩进乱了 / 行首空格没了</td>
+          <td>速度太快，编辑器来不及处理</td>
+          <td>速度换成「正常（30ms）」重敲一遍；Python 缩进敏感，敲完一定用「读一下」核对字符数</td>
+        </tr>
+        <tr>
+          <td>我自己往 PTA 框里 Ctrl+V，弹出「禁止粘贴」</td>
+          <td>PTA 拦的是直接粘贴</td>
+          <td>别往 PTA 的框里粘，粘到面板里那个框，然后点「敲进去」</td>
+        </tr>
+        <tr>
+          <td>黑色窗口一闪而过 / 显示乱码</td>
+          <td>正常现象，那窗口只是提示用</td>
+          <td>不用管，看浏览器有没有弹安装页</td>
+        </tr>
+        <tr>
+          <td>不想用了</td>
+          <td>—</td>
+          <td>油猴管理面板里把「PTA 逐字输入」禁掉或删掉，页面上就再也不会出现面板</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ 原理 ============ -->
+  <div class="step">
+    <h2><span class="n">i</span>它到底是怎么做到的（一句话版）</h2>
+    <p>PTA 的「禁止粘贴」拦的是<b>粘贴这个动作</b>（paste 事件和剪贴板数据）。这个脚本压根不碰剪贴板：它通过编辑器自己的接口（CodeMirror 的 <code>dispatch</code>）、浏览器的编辑命令（<code>execCommand</code>）、以及最原始的直接赋值，把字符一个接一个放进代码框里。这三条路都不产生粘贴事件，所以禁令拦不到它。</p>
+    <p>顺带说一句：浏览器不允许网页伪造「真实的键盘按键」，所以做不到真正意义上的模拟键盘 —— 但这不重要，结果是代码确实出现在了框里。</p>
+    <details>
+      <summary>它明确不会做的事</summary>
+      <ul style="margin-top:8px">
+        <li>不联网。整个脚本没有一处网络请求，同学电脑上不用装任何服务</li>
+        <li>不读你的题目、不识别你的考试、不上传任何东西</li>
+        <li>不点保存、不点提交、不点交卷、不点结束考试</li>
+        <li>不会碰 PTA 的登录状态和 cookie</li>
+      </ul>
+    </details>
+  </div>
+
+  <p class="foot">
+    遇到查不到的情况，把面板状态行那行字发回来（截图最好）。<br>
+    纯本地运行 · 不联网 · 不上传 · 不提交
+  </p>
+</div>
+</body>
+</html>

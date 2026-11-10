@@ -1,0 +1,28 @@
+# 打包产物 / 运行时数据 —— 不进版本库
+dist/
+build/
+*.spec
+__pycache__/
+*.py[cod]
+*.log
+selftest.log
+
+# 生成的安装页（由 生成安装页.py 从 书签工具.js 产出）
+# 如果想让 clone 下来就能用，把下面这行注释掉
+# 安装书签.html
+
+# 个人配置与缓存（exe 把偏好写在 %LOCALAPPDATA%，不会落在仓库里）
+config.json
+cache.db
+cache.db-journal
+cache.db-wal
+bank.json
+
+# 渲染与临时文件
+_render*/
+*.pdf
+~$*
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
