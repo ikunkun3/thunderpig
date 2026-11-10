@@ -5,7 +5,7 @@
 
 ![exe 界面](docs/exe-ui.png)
 
-**[⬇ 下载 exe](https://github.com/ikunkun3/pta-typer/releases/latest/download/pta-typer-v1.3.1.exe)** · 单文件 · 免安装 · 不联网
+**[⬇ 下载 exe](https://github.com/ikunkun3/pta-typer/releases/latest/download/pta-typer.exe)** · 单文件 · 免安装 · 不联网
 
 （[全部文件](https://github.com/ikunkun3/pta-typer/releases/latest) / 想要书签和油猴脚本就下 zip 包）
 
