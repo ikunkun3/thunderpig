@@ -7,6 +7,12 @@ __pycache__/
 *.log
 selftest.log
 
+# Release 附件（体积大，走 Release 不走版本库）
+pta-typer.exe
+pta-typer-all.zip
+哇嘞哇嘞大雷猪.exe
+PTA逐字输入-给同学.zip
+
 # 生成的安装页（由 生成安装页.py 从 书签工具.js 产出）
 # 如果想让 clone 下来就能用，把下面这行注释掉
 # 安装书签.html
