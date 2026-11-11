@@ -840,7 +840,10 @@ def run_gui():
     body.pack(fill="both", expand=True, padx=14, pady=(8, 0))
     body.rowconfigure(0, weight=1)
     body.columnconfigure(0, weight=1)
-    text = tk.Text(body, wrap="none", undo=True, bg="#0b0d12", fg="#c4b5fd",
+    # height=1：只声明最小需求高度，真正的空间由 grid sticky=nsew + 行 weight=1 分配。
+    # 不写 height 的话 Text 默认按 24 行算请求高（约 714px），窗口高度不够时
+    # 下面整条控制条（速度 / 等待 / PTA 模式 / 开始敲）会被挤成 0 高、完全看不见。
+    text = tk.Text(body, wrap="none", undo=True, height=1, bg="#0b0d12", fg="#c4b5fd",
                    insertbackground="#c4b5fd", relief="flat", bd=0,
                    font=("Consolas", 12), padx=10, pady=8)
     text.grid(row=0, column=0, sticky="nsew")
