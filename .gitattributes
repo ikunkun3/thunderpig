@@ -1,4 +1,12 @@
+# 文本文件统一 LF 入库；.bat 例外——见下
 * text=auto eol=lf
-*.bat text eol=crlf
+
+# 这两个 .bat 是 GBK 编码（cmd 里要显示中文只能这样），git 按文本处理会
+# 在每次 add 时把 CRLF 换成 LF，产生「40 行全改」的假 diff，甚至可能把
+# GBK 字节弄坏。标成 binary 就是让 git 一个字节都别动。
+*.bat -text
+
 *.png binary
+*.ico binary
 *.docx binary
+*.zip binary
