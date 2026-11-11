@@ -64,6 +64,22 @@ ICON = {
 }
 
 
+def _favicon():
+    """32px 图标内联成 data URI —— 页面保持单文件、零外部请求。"""
+    import base64
+    import io as _io
+    import importlib.util as _ilu
+    import os as _os
+    here = _os.path.dirname(_os.path.abspath(__file__))
+    spec = _ilu.spec_from_file_location("_gen", _os.path.join(here, "生成图标.py"))
+    mod = _ilu.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    buf = _io.BytesIO()
+    mod.draw_pixel_icon(32).save(buf, format="PNG")
+    return ('<link rel="icon" type="image/png" href="data:image/png;base64,%s">'
+            % base64.b64encode(buf.getvalue()).decode("ascii"))
+
+
 def _i(name, size=18, sw=2):
     return ('<svg class="i" viewBox="0 0 24 24" width="%d" height="%d" fill="none" '
             'stroke="currentColor" stroke-width="%s" stroke-linecap="round" '
@@ -73,6 +89,7 @@ def _i(name, size=18, sw=2):
 HTML = u"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+__FAVICON__
 <title>装一个书签 · PTA 逐字输入</title>
 <style>
 :root{
@@ -261,7 +278,8 @@ document.getElementById("cp").onclick = function () {
 def build():
     code = minify(io.open(SRC, encoding="utf-8").read())
     url = "javascript:" + urllib.parse.quote("void(function(){" + code + "\n})()", safe="")
-    html = HTML.replace("__URL__", url)
+    html = HTML.replace("__FAVICON__", _favicon())
+    html = html.replace("__URL__", url)
     for name in ICON:
         html = html.replace("__I_%s__" % name.upper(), _i(name, 18))
     # 图标尺寸微调：标题里的稍大、行内注释里的稍小
