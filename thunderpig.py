@@ -49,6 +49,20 @@ CFG_OLD_DIR = "哇嘞哇嘞大雷猪"
 CFG_OLDER_DIR = "PTA逐字输入"
 
 
+def res_path(name):
+    """找一个随程序一起发布的资源文件。
+
+    打包成 exe 后，PyInstaller 会把 --add-data 的东西解到临时目录，
+    路径在 sys._MEIPASS；直接跑 .py 时就在本文件旁边。
+    """
+    base = getattr(sys, "_MEIPASS", None)
+    if base:
+        p = os.path.join(base, name)
+        if os.path.exists(p):
+            return p
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), name)
+
+
 def cfg_path():
     base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
     return os.path.join(base, CFG_DIR, "cfg.json")
@@ -794,6 +808,22 @@ def run_gui():
 
     root = tk.Tk()
     root.title(APP_TITLE + " v" + VERSION)
+    # 窗口 / 任务栏图标。Tk 的 PhotoImage 读不了 .ico，所以另附一张 64px PNG；
+    # 两个都试，哪个成功用哪个（iconbitmap 管标题栏，iconphoto 管任务栏与 Alt+Tab）。
+    try:
+        _ico = res_path("ThunderPig.ico")
+        if os.path.exists(_ico):
+            root.iconbitmap(default=_ico)
+    except Exception:
+        pass
+    try:
+        _png = res_path("ThunderPig-64.png")
+        if os.path.exists(_png):
+            _img = tk.PhotoImage(file=_png)
+            root.iconphoto(True, _img)
+            root._icon_ref = _img          # 留个引用，别让 GC 把图收了
+    except Exception:
+        pass
     try:
         _dpi = root.winfo_fpixels("1i") or 96.0
     except Exception:

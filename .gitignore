@@ -10,6 +10,7 @@ selftest.log
 # Release 附件（体积大，走 Release 不走版本库）
 ThunderPig.exe
 ThunderPig-all.zip
+ThunderPig.zip
 pta-typer.exe
 pta-typer-all.zip
 哇嘞哇嘞大雷猪.exe
@@ -34,4 +35,3 @@ Thumbs.db
 Desktop.ini
 .vscode/
 .idea/
-ThunderPig.zip

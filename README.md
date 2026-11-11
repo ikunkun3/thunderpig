@@ -166,7 +166,11 @@ exe 是主推的，但同样的功能还有两个更轻的实现。三种写进�
 
 ```bash
 python -m pip install pyinstaller
-python -m PyInstaller --noconfirm --onefile --noconsole --name "ThunderPig" thunderpig.py
+# 用 PowerShell 时把行尾的 \ 换成 `
+python -m PyInstaller --noconfirm --onefile --noconsole --name "ThunderPig" \
+  --icon ThunderPig.ico \
+  --add-data "ThunderPig.ico;." --add-data "ThunderPig-64.png;." \
+  thunderpig.py
 ```
 
 只依赖标准库（`tkinter` / `ctypes`），没有第三方运行时依赖。
@@ -249,6 +253,8 @@ view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: code } })
 | 文件 | 作用 |
 |---|---|
 | `thunderpig.py` | **exe 的源码**（tkinter + ctypes，标准库） |
+| `ThunderPig.ico` / `ThunderPig-64.png` | 程序图标（紫底猪头 + 闪电），由 `生成图标.py` 生成 |
+| `生成图标.py` | 画图标：先在 1024px 上画，再 LANCZOS 缩到 16~256 九档 |
 | `PTA逐字输入说明.md` | exe / 油猴的详细说明 |
 | `三种方式说明.md` | 三种方式的完整对比与原理 |
 | `书签工具.js` | 书签的代码本体（bookmarklet 源） |
