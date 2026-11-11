@@ -220,7 +220,7 @@ li b{color:var(--fg)}
 </div>
 
 <p class="foot">__I_SPARKLES__　书签面板的源码在 <span class="mono">书签工具.js</span>，可自行审阅</p>
-<p class="foot" style="margin-top:10px">作者 <b style="color:var(--fg2)">ikunkun3</b> · <span class="mono">github.com/ikunkun3/pta-typer</span> · MIT 许可</p>
+<p class="foot" style="margin-top:10px">作者 <b style="color:var(--fg2)">ikunkun3</b> · <span class="mono">github.com/ikunkun3/thunderpig</span> · MIT 许可</p>
 
 </div>
 <script>

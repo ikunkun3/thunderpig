@@ -37,7 +37,7 @@ window.addEventListener('error', function (e) {
 
 <!-- 带 cache buster，避免改了脚本刷新还是旧版 -->
 <script>
-  document.write('<script src="pta-typer.user.js?t=' + Date.now() + '"><\/script>');
+  document.write('<script src="thunderpig.user.js?t=' + Date.now() + '"><\/script>');
 </script>
 
 <script>
@@ -91,12 +91,12 @@ window.addEventListener('error', function (e) {
     });
   }
 
-  var A = window.__PTA_TYPER__;
+  var A = window.__THUNDERPIG__;
 
   // ================= 0. 环境 =================
-  ck('脚本已加载（__PTA_TYPER__ 存在）', !!A);
-  ck('面板已创建（#pta-typer）', !!document.getElementById('pta-typer'));
-  ck('入口按钮已创建（#pta-typer-fab）', !!document.getElementById('pta-typer-fab'));
+  ck('脚本已加载（__THUNDERPIG__ 存在）', !!A);
+  ck('面板已创建（#thunderpig）', !!document.getElementById('thunderpig'));
+  ck('入口按钮已创建（#thunderpig-fab）', !!document.getElementById('thunderpig-fab'));
   if (!A) return finish();
 
   // ================= 1. 面板里自己的粘贴要能用 =================
@@ -105,7 +105,7 @@ window.addEventListener('error', function (e) {
   var pasteHits = 0;
   document.addEventListener('paste', function () { pasteHits++; }, true);
 
-  var ta = document.querySelector('#pta-typer textarea');
+  var ta = document.querySelector('#thunderpig textarea');
   ta.value = '';
   ta.focus();
   var dt = new DataTransfer();

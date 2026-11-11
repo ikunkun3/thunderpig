@@ -1,5 +1,5 @@
 // PTA 逐字输入 —— 书签小工具（bookmarklet）
-// 作者：ikunkun3（@ikunkun3）  https://github.com/ikunkun3/pta-typer
+// 作者：ikunkun3（@ikunkun3）  https://github.com/ikunkun3/thunderpig
 // 许可：MIT —— 转载 / 二次修改请保留本段署名。
 // 用法：在 PTA 编程题页面点一下这个书签，弹框，粘代码，Ctrl+Enter。
 // 不装扩展、不联网、不碰剪贴板事件、不点任何按钮。
@@ -131,7 +131,7 @@
     + '<span class="hint">只写字，不点保存、不点提交</span></div>'
     + '<div class="st"><span class="sic">' + svg(P.info, 15) + '</span>'
     + '<span class="stx">粘完按 Ctrl+Enter 直接写</span></div>'
-    + '<div class="crd">by <b>@ikunkun3</b> · MIT · github.com/ikunkun3/pta-typer</div>'
+    + '<div class="crd">by <b>@ikunkun3</b> · MIT · github.com/ikunkun3/thunderpig</div>'
     + '</div>';
   document.body.appendChild(wrap);
 

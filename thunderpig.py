@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""哇嘞哇嘞大雷猪（独立 exe 版）
+"""ThunderPig · 哇嘞哇嘞大雷猪（独立 exe 版）
 
 把代码一个字一个字敲进 PTA 的代码框里。不装油猴、不装扩展：
 直接向「当前有焦点的窗口」发送真实键盘事件（SendInput），
@@ -13,12 +13,12 @@
     4. 敲完自己去点提交
 
 命令行走查：
-    哇嘞哇嘞大雷猪.exe --selftest [日志路径]
+    ThunderPig.exe --selftest [日志路径]
 
 ────────────────────────────────────────────────────────────
 作者  : ikunkun3  (@ikunkun3)
 主页  : https://github.com/ikunkun3
-项目  : https://github.com/ikunkun3/pta-typer
+项目  : https://github.com/ikunkun3/thunderpig
 许可  : MIT
 ────────────────────────────────────────────────────────────
 这个文件是本项目的核心：Windows SendInput 键盘事件注入 +
@@ -35,7 +35,7 @@ import threading
 import time
 from ctypes import wintypes
 
-APP_TITLE = "哇嘞哇嘞大雷猪"
+APP_TITLE = "ThunderPig"
 VERSION = "1.3.1"
 
 INTRO = (
@@ -44,8 +44,9 @@ INTRO = (
     "不联网 · 不替你点任何按钮 —— 题目还是你自己提交。",
 )
 
-CFG_DIR = "哇嘞哇嘞大雷猪"
-CFG_OLD_DIR = "PTA逐字输入"
+CFG_DIR = "ThunderPig"
+CFG_OLD_DIR = "哇嘞哇嘞大雷猪"
+CFG_OLDER_DIR = "PTA逐字输入"
 
 
 def cfg_path():
@@ -54,15 +55,23 @@ def cfg_path():
 
 
 def cfg_migrate():
-    """把老版本的配置目录搬家过来，别让用户升级一次就丢设置。"""
+    """把老版本的配置目录搬家过来，别让用户升级一次就丢设置。
+
+    历史上有两个旧名字，从近到远依次找：先找「哇嘞哇嘞大雷猪」，
+    再找最早的「PTA逐字输入」。哪个存在就搬哪个，都不存在就什么都不做。
+    """
     try:
         base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
         new = os.path.join(base, CFG_DIR)
-        old = os.path.join(base, CFG_OLD_DIR)
-        if os.path.isdir(new) or not os.path.isdir(old):
+        if os.path.isdir(new):
             return False
-        shutil.move(old, new)
-        return True
+        for name in (CFG_OLD_DIR, CFG_OLDER_DIR):
+            old = os.path.join(base, name)
+            if not os.path.isdir(old):
+                continue
+            shutil.move(old, new)
+            return True
+        return False
     except Exception:
         return False
 
@@ -952,7 +961,7 @@ def run_gui():
                             "为什么会弹「Windows 已保护你的电脑」：它要模拟键盘，被杀毒软件当成可疑程序了。\n"
                             "点「更多信息」→「仍要运行」即可。它不联网、不读文件、代码全在这个 exe 里。\n\n"
                             "作者：ikunkun3（@ikunkun3）\n"
-                            "项目：https://github.com/ikunkun3/pta-typer\n"
+                            "项目：https://github.com/ikunkun3/thunderpig\n"
                             "许可：MIT —— 转载 / 二次修改请保留署名。")
 
     help_btn.bind("<Button-1>", show_help)
@@ -981,7 +990,7 @@ def run_gui():
 
     credit = tk.Label(root, anchor="w", justify="left", wraplength=730, bg="#f7f7fb",
                       fg="#b6bcc9", font=("Microsoft YaHei UI", 9),
-                      text="作者 ikunkun3（@ikunkun3） · github.com/ikunkun3/pta-typer · MIT 许可")
+                      text="作者 ikunkun3（@ikunkun3） · github.com/ikunkun3/thunderpig · MIT 许可")
     credit.pack(fill="x", padx=14, pady=(0, 10))
 
     def _reset():

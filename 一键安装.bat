@@ -1,11 +1,11 @@
 @echo off
 title PTA 逐字输入 - 一键安装
 setlocal enabledelayedexpansion
-set "F=%~dp0pta-typer.user.js"
+set "F=%~dp0thunderpig.user.js"
 if not exist "%F%" (
   echo.
-  echo   [X] 没找到 pta-typer.user.js
-  echo       请把这个 bat 和 pta-typer.user.js 放在同一个文件夹里。
+  echo   [X] 没找到 thunderpig.user.js
+  echo       请把这个 bat 和 thunderpig.user.js 放在同一个文件夹里。
   echo.
   pause
   exit /b 1

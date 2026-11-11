@@ -80,10 +80,11 @@
 
 <script type="text/plain" id="raw">// ==UserScript==
 // @name         PTA 逐字输入（禁粘贴也能进）
-// @namespace    pta-typer
+// @author       ikunkun3 (@ikunkun3) — https://github.com/ikunkun3/thunderpig
+// @namespace    thunderpig
 // @version      1.1.0
 // @description  把代码一个字符一个字符"打"进 PTA 的代码编辑器。全程不经过剪贴板，所以「禁止粘贴」拦不住。打开答题页面板会自己弹出。纯本地运行，不联网、不提交、不点任何按钮。
-// @author       local
+// @license      MIT
 // @match        https://pintia.cn/*
 // @match        https://www.pintia.cn/*
 // @grant        GM_addStyle
@@ -113,6 +114,13 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
 "看起来在敲"，真正把字放进去的是上面三条。因此本脚本默认不发假按键，
 只把字一个一个字放进去——效果一样，还少一层可能出岔子的地方。
 
+
+作者与许可
+----------
+作者：ikunkun3（@ikunkun3）
+项目：https://github.com/ikunkun3/thunderpig
+许可：MIT —— 转载 / 二次修改请保留本段署名。
+
 */
 
 (function () {
@@ -120,9 +128,14 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
 
   // ============================ 常量 ============================
 
-  var PANEL_ID = 'pta-typer';
-  var STORE_KEY = 'pta_typer_cfg_v1';
-  var LAST_KEY = 'pta_typer_last_v1';
+  var PANEL_ID = 'thunderpig';
+  var STORE_KEY = 'thunderpig_cfg_v1';
+  var LAST_KEY = 'thunderpig_last_v1';
+  // 改名前的键名。老用户升级后第一次打开，把这三样搬过来，别丢设置。
+  var OLD_KEYS = {
+    'thunderpig_cfg_v1': 'pta_typer_cfg_v1',
+    'thunderpig_last_v1': 'pta_typer_last_v1'
+  };
 
   var DELAYS = [
     { label: '极快 (0ms)', v: 0 },
@@ -451,11 +464,14 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
     'transition:width .08s linear}',
     '#' + PANEL_ID + ' .tip{font-size:11px;color:#6b7280;line-height:1.6}',
     '#' + PANEL_ID + ' .tip b{color:#7c3aed}',
-    '#pta-typer-fab{position:fixed;right:18px;bottom:18px;z-index:2147482999;',
+    '#' + PANEL_ID + ' .crd{margin-top:8px;padding-top:7px;border-top:1px solid #ece9f6;',
+    'font-size:10.5px;color:#9ca3af;letter-spacing:.2px}',
+    '#' + PANEL_ID + ' .crd b{color:#7c3aed;font-weight:600}',
+    '#thunderpig-fab{position:fixed;right:18px;bottom:18px;z-index:2147482999;',
     'padding:8px 14px;border-radius:20px;border:0;background:#7c3aed;color:#fff;',
     'font:600 13px/1 -apple-system,"Microsoft YaHei",sans-serif;cursor:pointer;',
     'box-shadow:0 4px 14px rgba(124,58,237,.45)}',
-    '#pta-typer-fab.hide{display:none}',
+    '#thunderpig-fab.hide{display:none}',
   ].join('');
 
   var el = {};
@@ -470,9 +486,27 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
     (document.head || document.documentElement).appendChild(s);
   }
 
+  // 读一个键；新键没有就回退读改名前的旧键，顺手搬到新键名下。
+  // 只在「新键确实空」时才搬，避免覆盖用户改名后新改的设置。
+  function readStore(key) {
+    var v = null;
+    try { v = localStorage.getItem(key); } catch (e) { return null; }
+    if (v !== null && v !== undefined) return v;
+    var old = OLD_KEYS[key];
+    if (!old) return null;
+    try {
+      var o = localStorage.getItem(old);
+      if (o !== null && o !== undefined) {
+        localStorage.setItem(key, o);
+        return o;
+      }
+    } catch (e) { /* ignore */ }
+    return null;
+  }
+
   function loadCfg() {
     try {
-      var raw = localStorage.getItem(STORE_KEY);
+      var raw = readStore(STORE_KEY);
       if (raw) {
         var o = JSON.parse(raw);
         return { delay: Number(o.delay) || 0 };
@@ -571,7 +605,7 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
     } else {
       setStat('❌ ' + (res.msg || '失败') + (res.trace ? '  [' + res.trace.join(' ') + ']' : ''), 'err');
       // 失败时把原文打到控制台，方便手动复制
-      try { console.log('[pta-typer] 没敲进去，原文如下：\n' + code); } catch (e) { /* ignore */ }
+      try { console.log('[thunderpig] 没敲进去，原文如下：\n' + code); } catch (e) { /* ignore */ }
     }
   }
 
@@ -579,7 +613,7 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
     if (document.getElementById(PANEL_ID)) return;
 
     var fab = document.createElement('button');
-    fab.id = 'pta-typer-fab';
+    fab.id = 'thunderpig-fab';
     fab.textContent = '⌨ 逐字输入';
     document.body.appendChild(fab);
 
@@ -600,6 +634,7 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
         '<div class="stat"></div>' +
         '<div class="tip">只写字，<b>不会</b>点提交 / 保存 / 交卷。写完自己去点提交。<br>' +
           '快捷键：面板里 <b>Ctrl+Enter</b> 开始。</div>' +
+        '<div class="crd">by <b>@ikunkun3</b> · MIT · github.com/ikunkun3/thunderpig</div>' +
       '</div>';
     document.body.appendChild(wrap);
 
@@ -628,7 +663,7 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
 
     // 上次的内容
     try {
-      var last = localStorage.getItem(LAST_KEY);
+      var last = readStore(LAST_KEY);
       if (last) el.ta.value = last;
     } catch (e) { /* ignore */ }
 
@@ -729,7 +764,7 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
   }
 
   // 暴露给离线测试用
-  window.__PTA_TYPER__ = {
+  window.__THUNDERPIG__ = {
     findEditor: findEditor,
     viewOf: viewOf,
     readEditor: readEditor,

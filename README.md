@@ -1,4 +1,6 @@
-# PTA 逐字输入（哇嘞哇嘞大雷猪）
+# ThunderPig · PTA 逐字输入
+
+> 中文全名「哇嘞哇嘞大雷猪」。**ThunderPig** = 大雷（thunder）+ 猪（pig），照着念就是那个梗。
 
 > 把代码交给它，它**一个字一个字敲进** PTA 的代码框。
 > 敲的是真实键盘事件，不是粘贴 —— 所以 PTA 的「禁止粘贴」拦不到。
@@ -7,9 +9,9 @@
 
 ![exe 界面](docs/exe-ui.png)
 
-**[⬇ 下载 exe](https://github.com/ikunkun3/pta-typer/releases/latest/download/pta-typer.exe)** · 单文件 · 免安装 · 不联网
+**[⬇ 下载 exe](https://github.com/ikunkun3/thunderpig/releases/latest/download/ThunderPig.exe)** · 单文件 · 免安装 · 不联网
 
-（[全部文件](https://github.com/ikunkun3/pta-typer/releases/latest) / 想要书签和油猴脚本就下 zip 包）
+（[全部文件](https://github.com/ikunkun3/thunderpig/releases/latest) / 想要书签和油猴脚本就下 zip 包）
 
 ---
 
@@ -26,7 +28,7 @@
 - **不点保存、不点测试、不点提交** —— 源码里一行点击提交按钮的代码都没有
 - **不联网** —— 没有任何对外请求，没有更新检查，没有统计
 - **不读剪贴板**（除一处：你框子空着时点「开始敲」，它读一次剪贴板省得你手动粘）
-- **不读文件、不写注册表** —— 唯一的落盘是 `%LOCALAPPDATA%\哇嘞哇嘞大雷猪\cfg.json`，存你的速度和窗口位置
+- **不读文件、不写注册表** —— 唯一的落盘是 `%LOCALAPPDATA%\ThunderPig\cfg.json`，存你的速度和窗口位置
 
 ---
 
@@ -164,7 +166,7 @@ exe 是主推的，但同样的功能还有两个更轻的实现。三种写进�
 
 ```bash
 python -m pip install pyinstaller
-python -m PyInstaller --noconfirm --onefile --noconsole --name "哇嘞哇嘞大雷猪" pta_typer_gui.py
+python -m PyInstaller --noconfirm --onefile --noconsole --name "ThunderPig" thunderpig.py
 ```
 
 只依赖标准库（`tkinter` / `ctypes`），没有第三方运行时依赖。
@@ -172,7 +174,7 @@ python -m PyInstaller --noconfirm --onefile --noconsole --name "哇嘞哇嘞大�
 自检（不需要真的敲进浏览器）：
 
 ```bash
-python pta_typer_gui.py --selftest selftest.log
+python thunderpig.py --selftest selftest.log
 ```
 
 跑两段：
@@ -246,12 +248,12 @@ view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: code } })
 
 | 文件 | 作用 |
 |---|---|
-| `pta_typer_gui.py` | **exe 的源码**（tkinter + ctypes，标准库） |
+| `thunderpig.py` | **exe 的源码**（tkinter + ctypes，标准库） |
 | `PTA逐字输入说明.md` | exe / 油猴的详细说明 |
 | `三种方式说明.md` | 三种方式的完整对比与原理 |
 | `书签工具.js` | 书签的代码本体（bookmarklet 源） |
 | `安装书签.html` | 书签安装页，由 `生成安装页.py` 生成 |
-| `pta-typer.user.js` | 油猴脚本 |
+| `thunderpig.user.js` | 油猴脚本 |
 | `安装.html` / `一键安装.bat` | 油猴安装向导 |
 | `新手教程.html` | 零基础分步图文教程 |
 | `docs/PTA写代码使用说明-精简版.docx` | 两页快速上手 |

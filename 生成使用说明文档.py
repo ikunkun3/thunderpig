@@ -291,8 +291,8 @@ rich(doc, [("文档版本 ", {}), ("v1.0", {"mono": True}), ("　·　适用：C
      size=9.5, space_before=8, space_after=3)
 rich(doc, [("配套文件：", {"b": True}), ("安装书签.html", {"mono": True}),
            ("、", {}), ("书签工具.js", {"mono": True}),
-           ("、", {}), ("哇嘞哇嘞大雷猪.exe", {"mono": True}),
-           ("、", {}), ("pta-typer.user.js", {"mono": True})], size=9.5, space_after=0)
+           ("、", {}), ("ThunderPig.exe", {"mono": True}),
+           ("、", {}), ("thunderpig.user.js", {"mono": True})], size=9.5, space_after=0)
 
 # ---------- 目录 ----------
 p = para(doc, "目录", size=16, color=DARK, bold=True, space_after=10)
@@ -545,7 +545,7 @@ tip(doc, "warn", "它会先检查前台窗口：",
     "如果最前面的程序不是浏览器（Chrome / Edge / Firefox 等），它会直接取消并提示「一个字都没发出去」。"
     "这是为了防止你切错窗口，把代码敲到别的地方去。")
 
-tip(doc, "info", "名字有点奇怪？", "这个 exe 叫「哇嘞哇嘞大雷猪」，就是随手起的名字，不影响功能。"
+tip(doc, "info", "名字有点奇怪？", "这个 exe 叫 ThunderPig，中文全名「哇嘞哇嘞大雷猪」—— 随手起的名字，不影响功能。"
                                 "第一次运行 Windows 可能弹「已保护你的电脑」，点「更多信息」→「仍要运行」。")
 
 # ---------- 8 ----------
