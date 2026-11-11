@@ -100,6 +100,8 @@
     '#pta-bm .stx{min-width:0}',
     '#pta-bm .st.ok{color:#6ee7b7;background:rgba(16,185,129,.11);border-color:rgba(16,185,129,.3)}',
     '#pta-bm .st.bad{color:#fca5a5;background:rgba(239,68,68,.11);border-color:rgba(239,68,68,.3)}',
+    '#pta-bm .crd{padding:0 16px 12px;font-size:11px;color:#5e5880;letter-spacing:.2px}',
+    '#pta-bm .crd b{color:#8b83b5;font-weight:600}',
 
     '@keyframes pta-bm-in{from{opacity:0}to{opacity:1}}',
     '@keyframes pta-bm-pop{from{opacity:0;transform:translateY(10px) scale(.985)}',
@@ -129,6 +131,7 @@
     + '<span class="hint">只写字，不点保存、不点提交</span></div>'
     + '<div class="st"><span class="sic">' + svg(P.info, 15) + '</span>'
     + '<span class="stx">粘完按 Ctrl+Enter 直接写</span></div>'
+    + '<div class="crd">by <b>@ikunkun3</b> · MIT · github.com/ikunkun3/pta-typer</div>'
     + '</div>';
   document.body.appendChild(wrap);
 
