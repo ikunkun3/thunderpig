@@ -811,6 +811,8 @@ def run_gui():
     head.pack(fill="x")
     tk.Label(head, text=APP_TITLE, bg="#4c1d95", fg="white",
              font=("Microsoft YaHei UI", 13, "bold")).pack(side="left", padx=(14, 8), pady=8)
+    tk.Label(head, text="by @ikunkun3", bg="#4c1d95", fg="#c4b5fd",
+             font=("Microsoft YaHei UI", 9)).pack(side="left", padx=(0, 8), pady=(13, 0))
     help_btn = tk.Label(head, text=" ? ", bg="#7c3aed", fg="white", cursor="hand2",
                         font=("Microsoft YaHei UI", 14, "bold"))
     help_btn.pack(side="right", padx=(8, 14), pady=6)
@@ -948,7 +950,10 @@ def run_gui():
                             "4. 手离开键盘和鼠标，看着它一个字一个字打进去。\n"
                             "   打完了自己点「运行测试」→「提交本题作答」—— 提交这一步它绝不代劳。\n\n"
                             "为什么会弹「Windows 已保护你的电脑」：它要模拟键盘，被杀毒软件当成可疑程序了。\n"
-                            "点「更多信息」→「仍要运行」即可。它不联网、不读文件、代码全在这个 exe 里。")
+                            "点「更多信息」→「仍要运行」即可。它不联网、不读文件、代码全在这个 exe 里。\n\n"
+                            "作者：ikunkun3（@ikunkun3）\n"
+                            "项目：https://github.com/ikunkun3/pta-typer\n"
+                            "许可：MIT —— 转载 / 二次修改请保留署名。")
 
     help_btn.bind("<Button-1>", show_help)
 
@@ -972,7 +977,12 @@ def run_gui():
                    fg="#9ca3af", font=("Microsoft YaHei UI", 10),
                    text="只往浏览器里敲（会先检查最前面的窗口是不是浏览器，不是就取消）。"
                         "敲的时候别碰键盘鼠标，会串字。")
-    tip.pack(fill="x", padx=14, pady=(8, 10))
+    tip.pack(fill="x", padx=14, pady=(8, 2))
+
+    credit = tk.Label(root, anchor="w", justify="left", wraplength=730, bg="#f7f7fb",
+                      fg="#b6bcc9", font=("Microsoft YaHei UI", 9),
+                      text="作者 ikunkun3（@ikunkun3） · github.com/ikunkun3/pta-typer · MIT 许可")
+    credit.pack(fill="x", padx=14, pady=(0, 10))
 
     def _reset():
         state["busy"] = False
