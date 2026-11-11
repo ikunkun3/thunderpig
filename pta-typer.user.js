@@ -379,6 +379,9 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
     'transition:width .08s linear}',
     '#' + PANEL_ID + ' .tip{font-size:11px;color:#6b7280;line-height:1.6}',
     '#' + PANEL_ID + ' .tip b{color:#7c3aed}',
+    '#' + PANEL_ID + ' .crd{margin-top:8px;padding-top:7px;border-top:1px solid #ece9f6;',
+    'font-size:10.5px;color:#9ca3af;letter-spacing:.2px}',
+    '#' + PANEL_ID + ' .crd b{color:#7c3aed;font-weight:600}',
     '#pta-typer-fab{position:fixed;right:18px;bottom:18px;z-index:2147482999;',
     'padding:8px 14px;border-radius:20px;border:0;background:#7c3aed;color:#fff;',
     'font:600 13px/1 -apple-system,"Microsoft YaHei",sans-serif;cursor:pointer;',
@@ -528,6 +531,7 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
         '<div class="stat"></div>' +
         '<div class="tip">只写字，<b>不会</b>点提交 / 保存 / 交卷。写完自己去点提交。<br>' +
           '快捷键：面板里 <b>Ctrl+Enter</b> 开始。</div>' +
+        '<div class="crd">by <b>@ikunkun3</b> · MIT · github.com/ikunkun3/pta-typer</div>' +
       '</div>';
     document.body.appendChild(wrap);
 
