@@ -38,6 +38,11 @@ from ctypes import wintypes
 APP_TITLE = "ThunderPig"
 VERSION = "1.3.1"
 
+# 窗口能拖到多小。单位是像素，不乘 DPI 倍数 —— 这两个值同时也是
+# merge_geometry() 的下限，两处必须一致，否则存的尺寸会被抬回一个更大的值。
+MIN_W = 560
+MIN_H = 560
+
 INTRO = (
     "把代码一个字一个字敲进 PTA 的代码框。敲的是真实按键，不是粘贴，"
     "所以 PTA 的「禁止粘贴」拦不到。",
@@ -156,17 +161,22 @@ def enable_dpi_awareness():
 def merge_geometry(saved, k, screen=None):
     """把存下来的 "820x640+120+90" 和当前 DPI 倍数 k 合并。
 
-    从旧版本（写死 1.25 缩放的时代）升级上来时，存的可能是 760x600 ——
-    在高分屏上那是个袖珍窗口。所以尺寸取「存的」和「按 k 算的基准」里更大的，
-    位置沿用存的，用户拖过的位置不会被抢走。
+    用户拖过的尺寸和位置优先，k 只用来兜底：屏幕换了、缩放变了，
+    也不至于给出一个点不到按钮的袖珍窗口。
+
+    注意两件事，以前都写错过：
+    1. 不能拿 820*k / 640*k 当下限 —— 那等于「用户把窗口拖小、下次打开又被抬回原样」，
+       缩放手柄在这个程序里等于没用。
+    2. 下限要用**像素**，不能乘 k。minsize 的 560x560 是像素，这里要是写 520*k，
+       缩放 150% 时就变成 780 —— 比 minsize 还大，等于又把窗口顶回去。
 
     screen=(宽, 高) 时再夹一道：不许比屏幕还大，否则按钮跑到屏幕外面点不到。
     """
     m = re.match(r"^(\d+)x(\d+)([+-]\d+[+-]\d+)?$", str(saved or "").strip())
     if not m:
         return ""
-    w = max(int(m.group(1)), int(820 * k))
-    h = max(int(m.group(2)), int(640 * k))
+    w = max(int(m.group(1)), MIN_W)
+    h = max(int(m.group(2)), MIN_H)
     pos = m.group(3) or ""
     if screen:
         sw, sh = int(screen[0]), int(screen[1])
@@ -834,7 +844,11 @@ def run_gui():
     except Exception:
         pass
     root.geometry("%dx%d" % (int(820 * _k), int(640 * _k)))
-    root.minsize(int(680 * _k), int(520 * _k))
+    # 最小尺寸只防「小得没法用」，不防「小」。以前是 680*k x 520*k（缩放 150% 时
+    # 就是 1018x779），用户想把窗口拖窄一点都不行 —— 缩放手柄等于摆设。
+    # 560x560 是算出来的：把两行解释文字都收起来之后，标题条 + 黑框 + 三行控制条
+    # + 状态行 + 署名行仍能各占其位，一个都不会被压成 1px。
+    root.minsize(MIN_W, MIN_H)
     geo = merge_geometry(cfg.get("geometry"), _k,
                          (root.winfo_screenwidth(), root.winfo_screenheight()))
     if geo:
@@ -858,22 +872,27 @@ def run_gui():
 
     head_tip = tk.Label(root, text="", bg="#f7f7fb", fg="#6b7280",
                         font=("Microsoft YaHei UI", 10), anchor="w",
-                        justify="left", wraplength=730)
+                        justify="left", wraplength=600)
     head_tip.pack(fill="x", padx=14, pady=(8, 2))
+    intro_labels = []
     for i, line in enumerate(INTRO):
-        tk.Label(root, text=line, bg="#f7f7fb",
-                 fg="#6b7280" if i == 0 else "#9ca3af",
-                 font=("Microsoft YaHei UI", 10), anchor="w",
-                 justify="left", wraplength=730).pack(fill="x", padx=14)
+        lb = tk.Label(root, text=line, bg="#f7f7fb",
+                      fg="#6b7280" if i == 0 else "#9ca3af",
+                      font=("Microsoft YaHei UI", 10), anchor="w",
+                      justify="left", wraplength=600)
+        lb.pack(fill="x", padx=14)
+        intro_labels.append(lb)
 
     body = tk.Frame(root, bg="#f7f7fb")
     body.pack(fill="both", expand=True, padx=14, pady=(8, 0))
     body.rowconfigure(0, weight=1)
     body.columnconfigure(0, weight=1)
-    # height=1：只声明最小需求高度，真正的空间由 grid sticky=nsew + 行 weight=1 分配。
+    # height=1 / width=1：只声明最小需求尺寸，真正的空间由 grid sticky=nsew + 行/列 weight 分配。
     # 不写 height 的话 Text 默认按 24 行算请求高（约 714px），窗口高度不够时
     # 下面整条控制条（速度 / 等待 / PTA 模式 / 开始敲）会被挤成 0 高、完全看不见。
-    text = tk.Text(body, wrap="none", undo=True, height=1, bg="#0b0d12", fg="#c4b5fd",
+    # 不写 width 同理：默认 80 列会要求 1060px 宽，窗口就缩不窄了。
+    text = tk.Text(body, wrap="none", undo=True, height=1, width=1,
+                   bg="#0b0d12", fg="#c4b5fd",
                    insertbackground="#c4b5fd", relief="flat", bd=0,
                    font=("Consolas", 12), padx=10, pady=8)
     text.grid(row=0, column=0, sticky="nsew")
@@ -883,46 +902,56 @@ def run_gui():
     xs.grid(row=1, column=0, sticky="ew")
     text.configure(yscrollcommand=ys.set, xscrollcommand=xs.set)
 
+    # 控制条排三行。以前全部横着 pack 在一行里，DPI 250% 时这一条要 1028px 宽，
+    # 窗口一窄「清空」按钮就被压成 1px（h=1），肉眼看不见 —— 用户报的「功能被挤掉」。
+    # 拆成「速度 / 等待」「三个勾」「三个按钮」各占一行，最宽只需要约 450px，
+    # 窗口拖到最小也一个控件都不会变形。
     bar = tk.Frame(root, bg="#f7f7fb")
     bar.pack(fill="x", padx=14, pady=(10, 0))
+    row1 = tk.Frame(bar, bg="#f7f7fb")
+    row1.pack(fill="x")
+    row2 = tk.Frame(bar, bg="#f7f7fb")
+    row2.pack(fill="x", pady=(2, 0))
+    row3 = tk.Frame(bar, bg="#f7f7fb")
+    row3.pack(fill="x", pady=(4, 0))
 
-    tk.Label(bar, text="速度", bg="#f7f7fb", fg="#4b5563",
+    tk.Label(row1, text="速度", bg="#f7f7fb", fg="#4b5563",
              font=("Microsoft YaHei UI", 10)).pack(side="left")
-    speed = ttk.Combobox(bar, values=[s[0] for s in SPEEDS],
-                            state="readonly", width=14)
+    speed = ttk.Combobox(row1, values=[s[0] for s in SPEEDS],
+                            state="readonly", width=12)
     try:
         speed.current(int(cfg.get("speed", 1)))
     except Exception:
         speed.current(1)
     speed.pack(side="left", padx=(6, 12))
 
-    tk.Label(bar, text="等待", bg="#f7f7fb", fg="#4b5563",
+    tk.Label(row1, text="等待", bg="#f7f7fb", fg="#4b5563",
              font=("Microsoft YaHei UI", 10)).pack(side="left")
     try:
         wait0 = int(cfg.get("wait", 3))
     except Exception:
         wait0 = 3
     wait_sec = tk.IntVar(value=max(0, min(60, wait0)))
-    wait_sp = tk.Spinbox(bar, from_=0, to=60, width=4, textvariable=wait_sec,
+    wait_sp = tk.Spinbox(row1, from_=0, to=60, width=3, textvariable=wait_sec,
                          justify="center", font=("Microsoft YaHei UI", 10))
     wait_sp.pack(side="left", padx=(6, 2))
-    tk.Label(bar, text="秒", bg="#f7f7fb", fg="#4b5563",
+    tk.Label(row1, text="秒", bg="#f7f7fb", fg="#4b5563",
              font=("Microsoft YaHei UI", 10)).pack(side="left", padx=(0, 12))
 
     clear_first = tk.BooleanVar(value=bool(cfg.get("clearFirst", True)))
-    clear_cb = tk.Checkbutton(bar, text="先全选清空代码框", variable=clear_first,
+    clear_cb = tk.Checkbutton(row2, text="先全选清空代码框", variable=clear_first,
                               bg="#f7f7fb", fg="#374151", activebackground="#f7f7fb",
                               font=("Microsoft YaHei UI", 10))
     clear_cb.pack(side="left", padx=(0, 10))
 
     pta_mode = tk.BooleanVar(value=bool(cfg.get("ptaMode", True)))
-    pta_cb = tk.Checkbutton(bar, text="PTA 模式", variable=pta_mode,
+    pta_cb = tk.Checkbutton(row2, text="PTA 模式", variable=pta_mode,
                             bg="#f7f7fb", fg="#374151", activebackground="#f7f7fb",
                             font=("Microsoft YaHei UI", 10))
     pta_cb.pack(side="left", padx=(0, 10))
 
     on_top = tk.BooleanVar(value=bool(cfg.get("topmost", True)))
-    top_cb = tk.Checkbutton(bar, text="置顶", variable=on_top,
+    top_cb = tk.Checkbutton(row2, text="置顶", variable=on_top,
                             bg="#f7f7fb", fg="#374151", activebackground="#f7f7fb",
                             font=("Microsoft YaHei UI", 10))
     top_cb.pack(side="left", padx=(0, 12))
@@ -954,8 +983,8 @@ def run_gui():
     apply_topmost()
 
     st = tk.Label(root, text="就绪 · 粘代码，或直接点「开始敲」（空着会自动读剪贴板）",
-                  bg="#f7f7fb", fg="#059669", anchor="w",
-                  font=("Microsoft YaHei UI", 11))
+                  bg="#f7f7fb", fg="#059669", anchor="w", justify="left",
+                  wraplength=600, font=("Microsoft YaHei UI", 11))
     st.pack(fill="x", padx=14, pady=(8, 0))
 
     def set_status(msg, color="#059669"):
@@ -999,32 +1028,86 @@ def run_gui():
 
     help_btn.bind("<Button-1>", show_help)
 
-    go_btn = tk.Button(bar, text="开始敲", bg="#6d28d9", fg="white", relief="flat",
+    go_btn = tk.Button(row3, text="开始敲", bg="#6d28d9", fg="white", relief="flat",
                        bd=0, padx=18, pady=6, cursor="hand2",
                        font=("Microsoft YaHei UI", 11, "bold"),
                        activebackground="#5b21b6", activeforeground="white")
     go_btn.pack(side="right", padx=(8, 0))
-    stop_btn = tk.Button(bar, text="停止", bg="#e5e7eb", fg="#374151", relief="flat",
+    stop_btn = tk.Button(row3, text="停止", bg="#e5e7eb", fg="#374151", relief="flat",
                          bd=0, padx=14, pady=6, cursor="hand2", state="disabled",
                          font=("Microsoft YaHei UI", 10),
                          activebackground="#d1d5db", activeforeground="#374151")
     stop_btn.pack(side="right", padx=(8, 0))
-    clr_btn = tk.Button(bar, text="清空", bg="#e5e7eb", fg="#374151", relief="flat",
+    clr_btn = tk.Button(row3, text="清空", bg="#e5e7eb", fg="#374151", relief="flat",
                         bd=0, padx=14, pady=6, cursor="hand2",
                         font=("Microsoft YaHei UI", 10),
                         activebackground="#d1d5db", activeforeground="#374151")
     clr_btn.pack(side="right")
 
-    tip = tk.Label(root, anchor="w", justify="left", wraplength=730, bg="#f7f7fb",
+    tip = tk.Label(root, anchor="w", justify="left", wraplength=600, bg="#f7f7fb",
                    fg="#9ca3af", font=("Microsoft YaHei UI", 10),
                    text="只往浏览器里敲（会先检查最前面的窗口是不是浏览器，不是就取消）。"
                         "敲的时候别碰键盘鼠标，会串字。")
     tip.pack(fill="x", padx=14, pady=(8, 2))
 
-    credit = tk.Label(root, anchor="w", justify="left", wraplength=730, bg="#f7f7fb",
+    credit = tk.Label(root, anchor="w", justify="left", wraplength=600, bg="#f7f7fb",
                       fg="#b6bcc9", font=("Microsoft YaHei UI", 9),
                       text="作者 ikunkun3（@ikunkun3） · github.com/ikunkun3/thunderpig · MIT 许可")
     credit.pack(fill="x", padx=14, pady=(0, 10))
+
+    # 窗口一变窄，所有自动换行的 Label 都跟着缩 —— 否则文字按 600px 排，
+    # 窗口缩到 560 时右半边被裁掉，看着像字被切了。
+    #
+    # 变矮的时候主动收起「解释性文字」：头顶那两行 INTRO 和底部那行灰字 tip，
+    # 它们是给人第一次看说明用的，不是操作必需。不收起的话窗口一矮，
+    # pack 会把最后三行（状态 / 底注 / 署名）压成 1px —— 那正是用户看到的「功能被挤掉」。
+    # 只在档位真正变化时才动 pack，不然每次 Configure 都重排会抖。
+    ui_state = {"mode": ""}
+
+    def _reflow(e=None):
+        if e is not None and e.widget is not root:
+            return
+        try:
+            w = root.winfo_width()
+            h = root.winfo_height()
+        except Exception:
+            return
+        if w <= 1 or h <= 1:
+            return
+        wrap = max(240, w - 34)
+        for lb in (head_tip, tip, credit, st):
+            try:
+                lb.configure(wraplength=wrap)
+            except Exception:
+                pass
+        for lb in intro_labels:
+            try:
+                lb.configure(wraplength=wrap)
+            except Exception:
+                pass
+
+        # 三档：够高就全展示；矮一点收起两行自我介绍（省 93px）；
+        # 再矮连底部灰字说明也收（再省 60px）。最小 560 时只剩操作必需的东西：
+        # 标题 / 提示 / 黑框 / 三行控制条 / 状态行 / 署名。这才是用户要的「不挤」。
+        mode = "full" if h >= 640 else ("compact" if h >= 600 else "tiny")
+        if mode == ui_state["mode"]:
+            return
+        ui_state["mode"] = mode
+        want_intro = mode == "full"
+        want_tip = mode != "tiny"
+        for lb in intro_labels:
+            shown = bool(lb.winfo_manager())
+            if want_intro and not shown:
+                lb.pack(fill="x", padx=14, before=body)
+            elif not want_intro and shown:
+                lb.pack_forget()
+        shown = bool(tip.winfo_manager())
+        if want_tip and not shown:
+            tip.pack(fill="x", padx=14, pady=(8, 2), before=credit)
+        elif not want_tip and shown:
+            tip.pack_forget()
+
+    root.bind("<Configure>", _reflow, add="+")
 
     def _reset():
         state["busy"] = False

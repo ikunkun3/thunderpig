@@ -61,8 +61,12 @@
   .editor .vs { width: 14px; background: #e9e9ef; }
   .editor .vh { position: absolute; left: 0; right: 14px; bottom: 0; height: 14px; background: #e9e9ef; }
 
-  /* ---------- 控制条 ---------- */
-  .ctrl { display: flex; align-items: center; padding: 10px 14px 0; gap: 0; }
+  /* ---------- 控制条（三行：速度等待 / 三个勾 / 三个按钮） ---------- */
+  .ctrl { padding: 10px 14px 0; }
+  .ctrl .row { display: flex; align-items: center; }
+  .ctrl .row + .row { margin-top: 4px; }
+  .ctrl .row.r1 { margin-top: 0; }
+  .ctrl .row.r3 { justify-content: flex-end; }
   .lbl { font-size: 13px; color: #4b5563; }
   .combo {
     margin: 0 12px 0 6px; font-size: 13px; color: #111;
@@ -144,18 +148,23 @@ merge2list = mergeTwoLists</pre>
   </div>
 
   <div class="ctrl">
-    <div class="lbl">速度</div>
-    <div class="combo"><span>快 (8 毫秒)</span><i>▾</i></div>
-    <div class="lbl">等待</div>
-    <div class="spin"><span>3</span><em><b>▲</b><b>▼</b></em></div>
-    <div class="unit">秒</div>
-    <div class="chk"><span class="box on"></span>先全选清空代码框</div>
-    <div class="chk"><span class="box on"></span>PTA 模式</div>
-    <div class="chk"><span class="box on"></span>置顶</div>
-    <div class="spacer"></div>
-    <div class="btn gray">清空</div>
-    <div class="btn gray off">停止</div>
-    <div class="btn go">开始敲</div>
+    <div class="row r1">
+      <div class="lbl">速度</div>
+      <div class="combo"><span>快 (8 毫秒)</span><i>▾</i></div>
+      <div class="lbl">等待</div>
+      <div class="spin"><span>3</span><em><b>▲</b><b>▼</b></em></div>
+      <div class="unit">秒</div>
+    </div>
+    <div class="row r2">
+      <div class="chk"><span class="box on"></span>先全选清空代码框</div>
+      <div class="chk"><span class="box on"></span>PTA 模式</div>
+      <div class="chk"><span class="box on"></span>置顶</div>
+    </div>
+    <div class="row r3">
+      <div class="btn gray">清空</div>
+      <div class="btn gray off">停止</div>
+      <div class="btn go">开始敲</div>
+    </div>
   </div>
 
   <div class="status">就绪 · 粘代码，或直接点「开始敲」（空着会自动读剪贴板）</div>
