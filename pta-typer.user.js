@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         PTA 逐字输入（禁粘贴也能进）
+// @author       ikunkun3 (@ikunkun3) — https://github.com/ikunkun3/pta-typer
 // @namespace    pta-typer
 // @version      1.1.0
 // @description  把代码一个字符一个字符"打"进 PTA 的代码编辑器。全程不经过剪贴板，所以「禁止粘贴」拦不住。打开答题页面板会自己弹出。纯本地运行，不联网、不提交、不点任何按钮。
-// @author       local
+// @license      MIT
 // @match        https://pintia.cn/*
 // @match        https://www.pintia.cn/*
 // @grant        GM_addStyle
@@ -32,6 +33,13 @@ PTA 拦的是 paste 事件 + clipboardData。这个脚本压根不碰剪贴板�
 （浏览器对 isTrusted=false 的按键不执行默认行为），所以"模拟键盘"能做的只是
 "看起来在敲"，真正把字放进去的是上面三条。因此本脚本默认不发假按键，
 只把字一个一个字放进去——效果一样，还少一层可能出岔子的地方。
+
+
+作者与许可
+----------
+作者：ikunkun3（@ikunkun3）
+项目：https://github.com/ikunkun3/pta-typer
+许可：MIT —— 转载 / 二次修改请保留本段署名。
 
 */
 

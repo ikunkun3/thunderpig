@@ -1,4 +1,6 @@
 // PTA 逐字输入 —— 书签小工具（bookmarklet）
+// 作者：ikunkun3（@ikunkun3）  https://github.com/ikunkun3/pta-typer
+// 许可：MIT —— 转载 / 二次修改请保留本段署名。
 // 用法：在 PTA 编程题页面点一下这个书签，弹框，粘代码，Ctrl+Enter。
 // 不装扩展、不联网、不碰剪贴板事件、不点任何按钮。
 // 图标来自 Lucide（ISC 许可），内联成 SVG path，不加载任何外部资源。

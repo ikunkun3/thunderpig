@@ -1,0 +1,9 @@
+署名：核心代码标注作者 @ikunkun3 与 MIT 许可
+
+- pta_typer_gui.py：docstring 补作者 / 主页 / 项目 / 许可四行，并说明这是核心（SendInput + 缩进对账）
+- 书签工具.js：头部补作者、项目地址、MIT
+- pta-typer.user.js：@author 从 local 改为 ikunkun3，补 @license MIT，正文注释也留一份
+- 生成安装页.py / 安装书签.html：页脚加作者与许可
+- LICENSE：版权人从 "pta-typer contributors" 改为 ikunkun3
+- README：标题下加作者行，许可段换成 MIT (c) 2026 ikunkun3 + 保留署名要求，页脚加署名
+- 契约新增 8 条署名断言（199 项），全量 602 项

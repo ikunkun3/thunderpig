@@ -14,6 +14,15 @@
 
 命令行走查：
     哇嘞哇嘞大雷猪.exe --selftest [日志路径]
+
+────────────────────────────────────────────────────────────
+作者  : ikunkun3  (@ikunkun3)
+主页  : https://github.com/ikunkun3
+项目  : https://github.com/ikunkun3/pta-typer
+许可  : MIT
+────────────────────────────────────────────────────────────
+这个文件是本项目的核心：Windows SendInput 键盘事件注入 +
+PTA 代码框自动缩进的预测与对账。转载 / 二次修改请保留本段署名。
 """
 
 import ctypes

@@ -3,6 +3,8 @@
 > 把代码交给它，它**一个字一个字敲进** PTA 的代码框。
 > 敲的是真实键盘事件，不是粘贴 —— 所以 PTA 的「禁止粘贴」拦不到。
 
+作者 **[@ikunkun3](https://github.com/ikunkun3)** · MIT 许可
+
 ![exe 界面](docs/exe-ui.png)
 
 **[⬇ 下载 exe](https://github.com/ikunkun3/pta-typer/releases/latest/download/pta-typer.exe)** · 单文件 · 免安装 · 不联网
@@ -268,4 +270,12 @@ view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: code } })
 
 ## 许可
 
-[MIT](LICENSE)。图标来自 [Lucide](https://lucide.dev)（ISC 许可），以内联 SVG path 形式嵌入，不加载任何外部资源。
+[MIT](LICENSE) © 2026 [ikunkun3](https://github.com/ikunkun3)
+
+图标来自 [Lucide](https://lucide.dev)（ISC 许可），以内联 SVG path 形式嵌入，不加载任何外部资源。
+
+转载、二次修改、再发布都随意，但请保留源码文件头部的作者署名与版权声明。
+
+---
+
+<p align="center"><sub>Made by <a href="https://github.com/ikunkun3">@ikunkun3</a> · 只负责搬运，不负责想。</sub></p>
