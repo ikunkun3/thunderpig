@@ -171,6 +171,10 @@ exe 是主推的，但同样的功能还有两个更轻的实现。三种写进�
 
 ## 从源码跑 / 自己打包
 
+**最省事：双击 `build.bat`。** 它会检查 Python 和 PyInstaller、确认图标文件在、关掉还在跑的老 exe、按正确参数打包、再复制回当前目录。这一步之所以单独写脚本，是因为手抄下面这行命令真会踩坑 —— 漏了 `--icon` 图标就变成 Tk 默认的羽毛笔，漏了 `--add-data` 运行时找不到 ico，而 `--add-data` 用相对路径还会被当成相对 `--specpath` 解析、报「找不到文件」。
+
+手动打包（`build.bat` 里就是这套）：
+
 ```bash
 python -m pip install pyinstaller
 # 用 PowerShell 时把行尾的 \ 换成 `
@@ -261,6 +265,7 @@ view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: code } })
 |---|---|
 | `thunderpig.py` | **exe 的源码**（tkinter + ctypes，标准库） |
 | `ThunderPig.ico` / `ThunderPig-64.png` | 程序图标（紫底猪头 + 闪电），由 `生成图标.py` 生成 |
+| `build.bat` | 双击打包 exe（参数已写死，不会漏 `--icon` / `--add-data`） |
 | `生成图标.py` | 画图标：每个尺寸按自己的细节档重画（16/20/24 直接落像素、其余 4 倍超采样），再手写 ICO 封装 9 档 |
 | `PTA逐字输入说明.md` | exe / 油猴的详细说明 |
 | `三种方式说明.md` | 三种方式的完整对比与原理 |
