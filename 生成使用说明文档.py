@@ -328,7 +328,8 @@ doc.add_page_break()
 h1(doc, "1", "先认识 PTA，再认识「PTA 模式 / 普通模式」")
 
 h2(doc, "PTA 是什么")
-para(doc, "PTA（Programming Teaching Assistant）是一个在线判题平台，拼题 A，网址是 pintia.cn。"
+para(doc, "PTA（Programming Teaching Assistant）是一个在线判题平台，中文名叫「拼题 A」，"
+          "打开 PTA 官网就能用。"
           "老师在上面建题库、发作业和考试，你在上面写代码、点提交，服务器用一批测试数据跑你的程序，"
           "全过就得分。它的编程题页面长这样：左边是题目描述、输入输出样例和各种限制，"
           "右边是一块黑色的代码编辑框。你在右边写完，点「测试用例」自查，最后点「提交本题作答」。")
@@ -579,7 +580,7 @@ tip(doc, "info", "原理一句话：",
     "书签版调的是编辑器自己的接口（CodeMirror 的 view.dispatch），exe 版发的是真实的键盘消息（SendInput）。"
     "两条路都不经过剪贴板，所以「禁止粘贴」对它没有意义。")
 
-p = para(doc, "— 完 —　截图均为虚构演示页，不含真实学校名称、教师姓名、学号或账号信息。",
+p = para(doc, "— 完 —　截图均为虚构演示页，不含任何真实学校、教师或账号身份信息。",
          size=9, color=GREY, align=WD_ALIGN_PARAGRAPH.CENTER, space_before=12)
 
 doc.save(OUT)
