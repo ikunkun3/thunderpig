@@ -5,7 +5,7 @@
 > 把代码交给它，它**一个字一个字敲进** PTA 的代码框。
 > 敲的是真实键盘事件，不是粘贴 —— 所以 PTA 的「禁止粘贴」拦不到。
 
-作者 **[@ikunkun3](https://github.com/ikunkun3)** · MIT 许可
+作者 **[@ikunkun3](https://github.com/ikunkun3)** · MIT 许可 · `v1.3.1`
 
 ![exe 界面](docs/exe-ui.png)
 
@@ -261,13 +261,14 @@ view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: code } })
 |---|---|
 | `thunderpig.py` | **exe 的源码**（tkinter + ctypes，标准库） |
 | `ThunderPig.ico` / `ThunderPig-64.png` | 程序图标（紫底猪头 + 闪电），由 `生成图标.py` 生成 |
-| `生成图标.py` | 画图标：先在 1024px 上画，再 LANCZOS 缩到 16~256 九档 |
+| `生成图标.py` | 画图标：每个尺寸按自己的细节档重画（16/20/24 直接落像素、其余 4 倍超采样），再手写 ICO 封装 9 档 |
 | `PTA逐字输入说明.md` | exe / 油猴的详细说明 |
 | `三种方式说明.md` | 三种方式的完整对比与原理 |
 | `书签工具.js` | 书签的代码本体（bookmarklet 源） |
 | `安装书签.html` | 书签安装页，由 `生成安装页.py` 生成 |
 | `thunderpig.user.js` | 油猴脚本 |
 | `安装.html` / `一键安装.bat` | 油猴安装向导 |
+| `打开PTA.bat` | 双击打开 PTA 首页（省得手动敲网址） |
 | `新手教程.html` | 零基础分步图文教程 |
 | `docs/PTA写代码使用说明-精简版.docx` | 两页快速上手 |
 | `docs/PTA写代码使用说明.docx` | 完整版 |
@@ -275,7 +276,9 @@ view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: code } })
 | `test-bm.html` / `test-typer.html` | 离线夹具 |
 | `使用说明_演示页.html` | 文档用的虚构演示页 |
 
-`docs/` 里的文档由 `生成使用说明文档.py` / `生成精简说明.py` 生成。截图全部来自 `使用说明_演示页.html` —— 一个画出来的假 PTA 页面（学校写「示例大学」、作者写「demo」、域名 `pintia.example.edu`），**不含任何真实学校与个人信息**。
+`docs/` 里的文档由 `生成使用说明文档.py` / `生成精简说明.py` 生成。
+
+所有截图都不是真机截屏：`shots/` 里的 9 张来自 `使用说明_演示页.html` —— 一个画出来的假 PTA 页面（学校写「示例大学」、作者写「demo」、域名 `pintia.example.edu`）；上面那张 exe 界面图来自 `docs/exe-ui.source.html` —— 照着 `thunderpig.py` 里的控件定义（颜色、字号、内边距、每一条文案）用 HTML 还原的示意图。所以整个仓库**不含任何真实学校、教师或账号身份信息**。
 
 ---
 
